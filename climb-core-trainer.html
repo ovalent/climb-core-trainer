@@ -1,0 +1,3052 @@
+<!DOCTYPE html>
+<html lang="fr" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#070A0F" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>ClimbCore 7a+ — Gainage Escalade</title>
+  <style>
+    :root {
+      --bg-oled: #06080d;
+      --bg-card: #101520;
+      --bg-card-elevated: #171e2e;
+      --bg-glass: rgba(16, 21, 32, 0.88);
+      --border: #232d42;
+      --border-light: #2e3b56;
+      --text-main: #f1f5f9;
+      --text-muted: #94a3b8;
+      --text-dim: #64748b;
+
+      --emerald: #10b981;
+      --emerald-glow: rgba(16, 185, 129, 0.25);
+      --amber: #f59e0b;
+      --amber-glow: rgba(245, 158, 11, 0.25);
+      --cyan: #06b6d4;
+      --cyan-glow: rgba(6, 182, 212, 0.25);
+      --coral: #f43f5e;
+      --coral-glow: rgba(244, 63, 94, 0.25);
+      --blue: #3b82f6;
+      --purple: #8b5cf6;
+
+      --radius-lg: 18px;
+      --radius-md: 12px;
+      --radius-sm: 8px;
+      --safe-bottom: env(safe-area-inset-bottom, 12px);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      background-color: var(--bg-oled);
+      color: var(--text-main);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      min-height: 100dvh;
+      overflow-x: hidden;
+      user-select: none;
+    }
+
+    .app-shell {
+      max-width: 520px;
+      margin: 0 auto;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      padding-bottom: calc(78px + var(--safe-bottom));
+      position: relative;
+    }
+
+    /* Header */
+    .top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 16px 10px;
+      position: sticky;
+      top: 0;
+      z-index: 30;
+      background: rgba(6, 8, 13, 0.9);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .brand-logo {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--emerald), var(--cyan));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      color: #04130e;
+      font-size: 15px;
+      box-shadow: 0 0 16px var(--emerald-glow);
+    }
+
+    .brand-title {
+      font-size: 17px;
+      font-weight: 800;
+      letter-spacing: -0.3px;
+    }
+
+    .brand-sub {
+      font-size: 11px;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .header-badges {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 5px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      background: var(--bg-card-elevated);
+      border: 1px solid var(--border-light);
+      color: var(--text-main);
+    }
+
+    .pill.emerald {
+      background: rgba(16, 185, 129, 0.14);
+      border-color: rgba(16, 185, 129, 0.4);
+      color: #34d399;
+    }
+
+    .pill.amber {
+      background: rgba(245, 158, 11, 0.14);
+      border-color: rgba(245, 158, 11, 0.4);
+      color: #fbbf24;
+    }
+
+    .pill.cyan {
+      background: rgba(6, 182, 212, 0.14);
+      border-color: rgba(6, 182, 212, 0.4);
+      color: #22d3ee;
+    }
+
+    .pill.coral {
+      background: rgba(244, 63, 94, 0.14);
+      border-color: rgba(244, 63, 94, 0.4);
+      color: #fb7185;
+    }
+
+    /* Main Content Views */
+    .view {
+      display: none;
+      padding: 16px;
+      flex-direction: column;
+      gap: 16px;
+      animation: fadeIn 0.2s ease;
+    }
+
+    .view.active {
+      display: flex;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Cards */
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 16px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .card-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .card-subtitle {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    /* Weekly Gauge & Level Bar */
+    .status-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .stat-box {
+      background: var(--bg-card-elevated);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .stat-label {
+      font-size: 11px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-weight: 600;
+    }
+
+    .stat-value {
+      font-size: 20px;
+      font-weight: 800;
+      display: flex;
+      align-items: baseline;
+      gap: 6px;
+    }
+
+    .stat-sub {
+      font-size: 11px;
+      color: var(--emerald);
+      font-weight: 600;
+    }
+
+    .progress-bar-track {
+      width: 100%;
+      height: 8px;
+      background: #0a0e17;
+      border-radius: 999px;
+      overflow: hidden;
+      margin-top: 6px;
+      border: 1px solid var(--border);
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--emerald), var(--cyan));
+      border-radius: 999px;
+      transition: width 0.35s ease;
+    }
+
+    /* Session Selector Tabs */
+    .session-tabs {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+
+    .session-tab {
+      background: var(--bg-card);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 12px 8px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      position: relative;
+    }
+
+    .session-tab.recommended::after {
+      content: "À FAIRE";
+      position: absolute;
+      top: -8px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--emerald);
+      color: #04130e;
+      font-size: 9px;
+      font-weight: 900;
+      padding: 2px 6px;
+      border-radius: 99px;
+      letter-spacing: 0.5px;
+    }
+
+    .session-tab.active-tab.session-A {
+      border-color: var(--coral);
+      background: rgba(244, 63, 94, 0.12);
+      box-shadow: 0 0 18px rgba(244, 63, 94, 0.18);
+    }
+    .session-tab.active-tab.session-B {
+      border-color: var(--blue);
+      background: rgba(59, 130, 246, 0.12);
+      box-shadow: 0 0 18px rgba(59, 130, 246, 0.18);
+    }
+    .session-tab.active-tab.session-C {
+      border-color: var(--emerald);
+      background: rgba(16, 185, 129, 0.12);
+      box-shadow: 0 0 18px rgba(16, 185, 129, 0.18);
+    }
+
+    .session-letter {
+      font-size: 18px;
+      font-weight: 900;
+      margin-bottom: 2px;
+    }
+
+    .session-short {
+      font-size: 11px;
+      color: var(--text-muted);
+      font-weight: 600;
+      line-height: 1.2;
+    }
+
+    /* Config Controls */
+    .config-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-top: 1px solid var(--border);
+    }
+
+    .config-row:first-of-type {
+      border-top: none;
+      padding-top: 4px;
+    }
+
+    .config-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+
+    .config-sub {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .segmented {
+      display: inline-flex;
+      background: #080b12;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 3px;
+      gap: 3px;
+    }
+
+    .seg-btn {
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      font-size: 12px;
+      font-weight: 700;
+      padding: 6px 11px;
+      border-radius: 7px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .seg-btn.active {
+      background: var(--bg-card-elevated);
+      color: var(--text-main);
+      border: 1px solid var(--border-light);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+    }
+
+    /* Exercise Preview List */
+    .exo-preview-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .exo-preview-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: var(--bg-card-elevated);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 10px 12px;
+      cursor: pointer;
+      transition: border-color 0.15s;
+    }
+
+    .exo-preview-item:active {
+      border-color: var(--cyan);
+    }
+
+    .exo-mini-svg {
+      width: 62px;
+      height: 54px;
+      flex-shrink: 0;
+      background: #090d15;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .exo-preview-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .exo-preview-name {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 2px;
+    }
+
+    .exo-preview-meta {
+      font-size: 11px;
+      color: var(--text-muted);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+    }
+
+    /* Primary CTA Button */
+    .btn-primary {
+      width: 100%;
+      border: none;
+      background: linear-gradient(135deg, var(--emerald), #059669);
+      color: #03120c;
+      font-size: 16px;
+      font-weight: 800;
+      padding: 16px 20px;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      box-shadow: 0 6px 22px var(--emerald-glow);
+      transition: transform 0.12s ease;
+    }
+
+    .btn-primary:active {
+      transform: scale(0.98);
+    }
+
+    .btn-secondary {
+      border: 1px solid var(--border-light);
+      background: var(--bg-card-elevated);
+      color: var(--text-main);
+      font-size: 13px;
+      font-weight: 700;
+      padding: 11px 14px;
+      border-radius: 10px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    /* Bottom Navigation */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 520px;
+      background: rgba(10, 14, 22, 0.95);
+      backdrop-filter: blur(16px);
+      border-top: 1px solid var(--border);
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      padding: 8px 8px calc(8px + var(--safe-bottom));
+      z-index: 40;
+    }
+
+    .nav-item {
+      border: none;
+      background: transparent;
+      color: var(--text-dim);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      padding: 6px 4px;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      border-radius: 10px;
+      transition: color 0.15s;
+    }
+
+    .nav-item.active {
+      color: var(--emerald);
+    }
+
+    .nav-icon {
+      font-size: 19px;
+      line-height: 1;
+    }
+
+    /* ==========================================
+       FULLSCREEN WORKOUT PLAYER OVERLAY
+       ========================================== */
+    .player-overlay {
+      position: fixed;
+      inset: 0;
+      background: var(--bg-oled);
+      z-index: 100;
+      display: none;
+      flex-direction: column;
+      max-width: 520px;
+      margin: 0 auto;
+      padding: 12px 16px calc(14px + var(--safe-bottom));
+      overflow-y: auto;
+    }
+
+    .player-overlay.active {
+      display: flex;
+    }
+
+    .player-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .icon-btn {
+      border: 1px solid var(--border);
+      background: var(--bg-card);
+      color: var(--text-main);
+      width: 40px;
+      height: 40px;
+      border-radius: 11px;
+      font-size: 16px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+
+    .icon-btn.active-toggle {
+      border-color: var(--emerald);
+      color: var(--emerald);
+      background: rgba(16, 185, 129, 0.12);
+    }
+
+    /* Step Progress Dots */
+    .step-progress-bar {
+      display: flex;
+      gap: 4px;
+      width: 100%;
+      margin-bottom: 10px;
+    }
+
+    .step-dot {
+      flex: 1;
+      height: 5px;
+      border-radius: 99px;
+      background: var(--border);
+      transition: background 0.25s;
+    }
+
+    .step-dot.done {
+      background: var(--emerald);
+    }
+
+    .step-dot.current {
+      background: var(--amber);
+      box-shadow: 0 0 8px var(--amber);
+    }
+
+    /* Phase Banner */
+    .phase-banner {
+      text-align: center;
+      padding: 7px 12px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 0.6px;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .phase-prep {
+      background: rgba(245, 158, 11, 0.16);
+      color: #fbbf24;
+      border: 1px solid rgba(245, 158, 11, 0.4);
+    }
+
+    .phase-work {
+      background: rgba(16, 185, 129, 0.16);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.45);
+    }
+
+    .phase-switch {
+      background: rgba(244, 63, 94, 0.22);
+      color: #fda4af;
+      border: 1px solid rgba(244, 63, 94, 0.6);
+      animation: pulseSwitch 0.6s infinite alternate;
+    }
+
+    .phase-rest {
+      background: rgba(6, 182, 212, 0.16);
+      color: #22d3ee;
+      border: 1px solid rgba(6, 182, 212, 0.4);
+    }
+
+    @keyframes pulseSwitch {
+      from { transform: scale(0.99); }
+      to { transform: scale(1.02); }
+    }
+
+    /* Player SVG Stage */
+    .player-stage {
+      background: #0a0f18;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+      margin-bottom: 10px;
+    }
+
+    .player-svg-container {
+      width: 100%;
+      height: 185px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .player-svg-container svg {
+      width: 100%;
+      height: 100%;
+      max-width: 320px;
+    }
+
+    .side-badge {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      padding: 4px 10px;
+      border-radius: 99px;
+      font-size: 11px;
+      font-weight: 800;
+      background: rgba(245, 158, 11, 0.2);
+      color: #fbbf24;
+      border: 1px solid rgba(245, 158, 11, 0.5);
+    }
+
+    .equip-badge {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      padding: 4px 9px;
+      border-radius: 99px;
+      font-size: 11px;
+      font-weight: 700;
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+    }
+
+    .player-exo-title {
+      font-size: 19px;
+      font-weight: 800;
+      text-align: center;
+      margin-top: 4px;
+    }
+
+    .player-exo-variant {
+      font-size: 12px;
+      color: var(--amber);
+      font-weight: 700;
+      text-align: center;
+      margin-top: 2px;
+    }
+
+    /* Circular Timer + Tempo Guide */
+    .timer-section {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 12px 16px;
+      margin-bottom: 10px;
+    }
+
+    .timer-ring-wrap {
+      position: relative;
+      width: 118px;
+      height: 118px;
+      flex-shrink: 0;
+    }
+
+    .timer-ring-svg {
+      width: 118px;
+      height: 118px;
+      transform: rotate(-90deg);
+    }
+
+    .timer-ring-bg {
+      fill: none;
+      stroke: #1a2234;
+      stroke-width: 9;
+    }
+
+    .timer-ring-fg {
+      fill: none;
+      stroke: var(--emerald);
+      stroke-width: 9;
+      stroke-linecap: round;
+      transition: stroke-dashoffset 0.25s linear, stroke 0.25s ease;
+    }
+
+    .timer-digits {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .timer-sec {
+      font-size: 36px;
+      font-weight: 900;
+      font-variant-numeric: tabular-nums;
+      line-height: 1;
+    }
+
+    .timer-unit {
+      font-size: 10px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      font-weight: 700;
+      margin-top: 2px;
+    }
+
+    /* Tempo Metronome Box */
+    .tempo-box {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .tempo-current-action {
+      font-size: 14px;
+      font-weight: 800;
+      padding: 7px 10px;
+      border-radius: 8px;
+      background: var(--bg-card-elevated);
+      border: 1px solid var(--border-light);
+      text-align: center;
+    }
+
+    .tempo-phases-bar {
+      display: flex;
+      gap: 4px;
+      height: 8px;
+    }
+
+    .tempo-seg {
+      flex: 1;
+      border-radius: 99px;
+      background: #1c2539;
+      transition: background 0.15s;
+    }
+
+    .tempo-seg.active-up { background: var(--emerald); box-shadow: 0 0 8px var(--emerald); }
+    .tempo-seg.active-hold { background: var(--amber); box-shadow: 0 0 8px var(--amber); }
+    .tempo-seg.active-down { background: var(--cyan); box-shadow: 0 0 8px var(--cyan); }
+
+    .cues-list {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .cue-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .cue-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--emerald);
+      flex-shrink: 0;
+    }
+
+    /* Player Controls */
+    .player-controls {
+      display: grid;
+      grid-template-columns: 1fr 1.6fr 1fr;
+      gap: 10px;
+      margin-top: auto;
+    }
+
+    .ctrl-btn {
+      border: 1px solid var(--border-light);
+      background: var(--bg-card-elevated);
+      color: var(--text-main);
+      border-radius: 14px;
+      padding: 14px 10px;
+      font-size: 14px;
+      font-weight: 800;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .ctrl-btn.main-pause {
+      background: var(--emerald);
+      color: #04130e;
+      border-color: var(--emerald);
+      font-size: 16px;
+    }
+
+    .ctrl-btn.main-pause.paused {
+      background: var(--amber);
+      border-color: var(--amber);
+    }
+
+    /* Calendar & History */
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 6px;
+      margin-top: 8px;
+    }
+
+    .cal-day-header {
+      text-align: center;
+      font-size: 10px;
+      color: var(--text-dim);
+      font-weight: 700;
+    }
+
+    .cal-cell {
+      aspect-ratio: 1;
+      border-radius: 8px;
+      background: var(--bg-card-elevated);
+      border: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-muted);
+      position: relative;
+    }
+
+    .cal-cell.today {
+      border-color: var(--cyan);
+      color: var(--text-main);
+    }
+
+    .cal-cell.done-A {
+      background: rgba(244, 63, 94, 0.22);
+      border-color: var(--coral);
+      color: #fda4af;
+    }
+    .cal-cell.done-B {
+      background: rgba(59, 130, 246, 0.22);
+      border-color: var(--blue);
+      color: #93c5fd;
+    }
+    .cal-cell.done-C {
+      background: rgba(16, 185, 129, 0.22);
+      border-color: var(--emerald);
+      color: #6ee7b7;
+    }
+
+    /* Modal / Finish Screen */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(3, 5, 9, 0.86);
+      backdrop-filter: blur(8px);
+      z-index: 120;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+    }
+
+    .modal-backdrop.active {
+      display: flex;
+    }
+
+    .modal-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-lg);
+      max-width: 440px;
+      width: 100%;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      max-height: 90dvh;
+      overflow-y: auto;
+    }
+
+    .rpe-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+
+    .rpe-btn {
+      background: var(--bg-card-elevated);
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      padding: 12px 8px;
+      color: var(--text-main);
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .rpe-btn.selected {
+      border-color: var(--emerald);
+      background: rgba(16, 185, 129, 0.16);
+    }
+
+    /* SVG Keyframe Animations for Climber Silhouette */
+    @keyframes legRaise {
+      0%, 100% { transform: rotate(0deg); }
+      40%, 65% { transform: rotate(-78deg); }
+    }
+    @keyframes hollowPulse {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-3px) rotate(-2deg); }
+    }
+    @keyframes wiperSweep {
+      0%, 100% { transform: rotate(-32deg); }
+      50% { transform: rotate(32deg); }
+    }
+    @keyframes bridgeLift {
+      0%, 100% { transform: translateY(8px); }
+      45%, 70% { transform: translateY(-6px); }
+    }
+    @keyframes pallofPush {
+      0%, 100% { transform: translateX(0px); }
+      40%, 75% { transform: translateX(18px); }
+    }
+    @keyframes deadBugMove {
+      0%, 100% { transform: rotate(0deg); }
+      50% { transform: rotate(38deg); }
+    }
+    @keyframes rowPull {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-12px); }
+    }
+    @keyframes archLift {
+      0%, 100% { transform: translateY(3px); }
+      50% { transform: translateY(-6px); }
+    }
+    @keyframes muscleGlow {
+      0%, 100% { opacity: 0.55; }
+      50% { opacity: 0.95; }
+    }
+
+    .anim-legs-hang {
+      transform-origin: 120px 92px;
+      animation: legRaise 4.5s ease-in-out infinite;
+    }
+    .anim-hollow {
+      transform-origin: 120px 105px;
+      animation: hollowPulse 3s ease-in-out infinite;
+    }
+    .anim-wiper {
+      transform-origin: 120px 112px;
+      animation: wiperSweep 4s ease-in-out infinite;
+    }
+    .anim-bridge {
+      animation: bridgeLift 3.8s ease-in-out infinite;
+    }
+    .anim-pallof {
+      animation: pallofPush 4.2s ease-in-out infinite;
+    }
+    .anim-deadbug-leg {
+      transform-origin: 118px 98px;
+      animation: deadBugMove 3.8s ease-in-out infinite;
+    }
+    .anim-row-arm {
+      animation: rowPull 3s ease-in-out infinite;
+    }
+    .anim-arch {
+      animation: archLift 3.5s ease-in-out infinite;
+    }
+    .muscle-heat {
+      animation: muscleGlow 1.8s ease-in-out infinite;
+    }
+  </style>
+</head>
+<body>
+
+<div class="app-shell">
+  <!-- TOP HEADER -->
+  <header class="top-bar">
+    <div class="brand">
+      <div class="brand-logo">7a+</div>
+      <div>
+        <div class="brand-title">ClimbCore</div>
+        <div class="brand-sub">Gainage Voie & Dévers • Pixel 10 Pro</div>
+      </div>
+    </div>
+    <div class="header-badges">
+      <span id="badgeWeek" class="pill cyan">Sem. 1/8</span>
+      <span id="badgeLevel" class="pill emerald">Niv. 1</span>
+    </div>
+  </header>
+
+  <!-- VIEW 1: TODAY / DASHBOARD -->
+  <main id="view-today" class="view active">
+    <!-- Status summary -->
+    <div class="status-grid">
+      <div class="stat-box">
+        <span class="stat-label">Objectif Semaine</span>
+        <div class="stat-value">
+          <span id="weeklyDoneCount">0</span>/<span id="weeklyTargetCount">3</span>
+          <span class="stat-sub">séances</span>
+        </div>
+        <div class="progress-bar-track">
+          <div id="weeklyProgressBar" class="progress-bar-fill" style="width: 0%"></div>
+        </div>
+      </div>
+      <div class="stat-box" onclick="app.openLevelPicker()" style="cursor:pointer;">
+        <span class="stat-label">Cycle Progression ⚙️</span>
+        <div class="stat-value">
+          <span id="currentLevelDisplay">Niveau 1</span>
+        </div>
+        <span id="currentLevelName" class="stat-sub">Fondation & Contrôle</span>
+      </div>
+    </div>
+
+    <!-- Session A / B / C selector -->
+    <div>
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+        <span style="font-size:13px; font-weight:700; color:var(--text-muted);">CHOISIR LA SÉANCE DU JOUR</span>
+        <span id="recHint" style="font-size:11px; color:var(--emerald); font-weight:700;">Rotation auto A ➔ B ➔ C</span>
+      </div>
+      <div class="session-tabs">
+        <div id="tab-A" class="session-tab session-A active-tab" onclick="app.selectSession('A')">
+          <div class="session-letter" style="color:var(--coral);">Séance A</div>
+          <div class="session-short">Tenue de pieds & Dévers</div>
+        </div>
+        <div id="tab-B" class="session-tab session-B" onclick="app.selectSession('B')">
+          <div class="session-letter" style="color:var(--blue);">Séance B</div>
+          <div class="session-short">Anti-Rotation & Croisés</div>
+        </div>
+        <div id="tab-C" class="session-tab session-C" onclick="app.selectSession('C')">
+          <div class="session-letter" style="color:var(--emerald);">Séance C</div>
+          <div class="session-short">Continuité Falaise</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Selected Session Detail Card -->
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <div id="sessionTitle" class="card-title">Séance A : Tenue de pieds & Dévers</div>
+          <div id="sessionGoal" class="card-subtitle">Cible la suspension poutre, la compression et le maintien des pieds hauts.</div>
+        </div>
+        <span id="sessionDurationBadge" class="pill amber">~14 min</span>
+      </div>
+
+      <div id="sessionEquipment" style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:12px;"></div>
+
+      <!-- Session Quick Customizer -->
+      <div class="config-row">
+        <div>
+          <div class="config-label">Nombre de tours du circuit</div>
+          <div class="config-sub" id="timingSummaryText">4 exercices • 30s effort / 20s repos</div>
+        </div>
+        <div class="segmented">
+          <button id="rounds-2" class="seg-btn" onclick="app.setRounds(2)">2</button>
+          <button id="rounds-3" class="seg-btn active" onclick="app.setRounds(3)">3</button>
+          <button id="rounds-4" class="seg-btn" onclick="app.setRounds(4)">4</button>
+        </div>
+      </div>
+
+      <div class="config-row">
+        <div>
+          <div class="config-label">Activation articulaire (2 min)</div>
+          <div class="config-sub">Cat-Cow + Dead Bug lent en début de séance</div>
+        </div>
+        <div class="segmented">
+          <button id="warmup-on" class="seg-btn active" onclick="app.setWarmup(true)">Oui</button>
+          <button id="warmup-off" class="seg-btn" onclick="app.setWarmup(false)">Non</button>
+        </div>
+      </div>
+
+      <!-- Exercises list in this session -->
+      <div class="exo-preview-list" id="sessionExoList"></div>
+
+      <div style="margin-top: 16px;">
+        <button class="btn-primary" onclick="app.startWorkout()">
+          <span>▶ LANCER LA SÉANCE</span>
+        </button>
+      </div>
+    </div>
+  </main>
+
+  <!-- VIEW 2: EXERCISE LIBRARY -->
+  <section id="view-library" class="view">
+    <div class="card">
+      <div class="card-title">Bibliothèque Technique & Animations</div>
+      <div class="card-subtitle">Touchez un exercice pour inspecter sa biomécanique escalade et ses 4 niveaux de progression.</div>
+      <div style="display:flex; gap:6px; margin-top:12px; flex-wrap:wrap;">
+        <button class="seg-btn active" id="filter-ALL" onclick="app.filterLibrary('ALL')">Tous (14)</button>
+        <button class="seg-btn" id="filter-A" onclick="app.filterLibrary('A')">Séance A</button>
+        <button class="seg-btn" id="filter-B" onclick="app.filterLibrary('B')">Séance B</button>
+        <button class="seg-btn" id="filter-C" onclick="app.filterLibrary('C')">Séance C</button>
+      </div>
+    </div>
+    <div id="libraryContainer" style="display:flex; flex-direction:column; gap:12px;"></div>
+  </section>
+
+  <!-- VIEW 3: PROGRESS & CALENDAR -->
+  <section id="view-progress" class="view">
+    <div class="status-grid">
+      <div class="stat-box">
+        <span class="stat-label">Séances Totales</span>
+        <div class="stat-value" id="statTotalSessions">0</div>
+        <span class="stat-sub">Depuis le début</span>
+      </div>
+      <div class="stat-box">
+        <span class="stat-label">Temps sous Tension</span>
+        <div class="stat-value"><span id="statTotalMinutes">0</span><span class="stat-sub">min</span></div>
+        <span class="stat-sub">Gainage cumulé</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <div class="card-title">Calendrier des 28 derniers jours</div>
+          <div class="card-subtitle">Régularité 2 à 3 séances / semaine</div>
+        </div>
+        <button class="btn-secondary" style="padding:6px 10px; font-size:11px;" onclick="app.logManualSessionPrompt()">+ Valider manuellement</button>
+      </div>
+      <div class="calendar-grid" id="calendarGrid"></div>
+      <div style="display:flex; gap:12px; margin-top:12px; font-size:11px; color:var(--text-muted); justify-content:center;">
+        <span>🔴 Séance A</span>
+        <span>🔵 Séance B</span>
+        <span>🟢 Séance C</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Plan de Progression sur 8 Semaines</div>
+      <div class="card-subtitle" style="margin-bottom:12px;">Touchez un palier pour activer ce niveau dans vos séances :</div>
+      <div id="levelsRoadmap" style="display:flex; flex-direction:column; gap:8px;"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Historique Récent</div>
+      <div id="historyList" style="display:flex; flex-direction:column; gap:8px; margin-top:10px;"></div>
+    </div>
+  </section>
+
+  <!-- VIEW 4: SETTINGS & DATA BACKUP (JSON / SQLITE) -->
+  <section id="view-settings" class="view">
+    <div class="card">
+      <div class="card-title">Préférences Pixel 10 Pro</div>
+      <div class="card-subtitle" style="margin-bottom:8px;">Réglages du chronomètre, du son et de l'objectif hebdomadaire.</div>
+
+      <div class="config-row">
+        <div>
+          <div class="config-label">Objectif de séances / semaine</div>
+          <div class="config-sub">Pour la jauge d'assiduité</div>
+        </div>
+        <div class="segmented">
+          <button id="target-2" class="seg-btn" onclick="app.setWeeklyTarget(2)">2 / sem</button>
+          <button id="target-3" class="seg-btn active" onclick="app.setWeeklyTarget(3)">3 / sem</button>
+        </div>
+      </div>
+
+      <div class="config-row">
+        <div>
+          <div class="config-label">Signaux Sonores (Bips 3-2-1 & Mi-temps)</div>
+          <div class="config-sub">Synthétiseur Web Audio intégré hors-ligne</div>
+        </div>
+        <div class="segmented">
+          <button id="sound-on" class="seg-btn active" onclick="app.setSound(true)">Activé</button>
+          <button id="sound-off" class="seg-btn" onclick="app.setSound(false)">Muet</button>
+        </div>
+      </div>
+
+      <div class="config-row">
+        <div>
+          <div class="config-label">Métronome de Tempo (Clic de phase)</div>
+          <div class="config-sub">Clic discret pour guider Montée / Blocage / Descente</div>
+        </div>
+        <div class="segmented">
+          <button id="metro-on" class="seg-btn active" onclick="app.setMetronome(true)">Oui</button>
+          <button id="metro-off" class="seg-btn" onclick="app.setMetronome(false)">Non</button>
+        </div>
+      </div>
+
+      <div class="config-row">
+        <div>
+          <div class="config-label">Transition de changement de côté (4s)</div>
+          <div class="config-sub">Pause auto de 4s à mi-temps sur les exos G/D</div>
+        </div>
+        <div class="segmented">
+          <button id="switchpause-on" class="seg-btn active" onclick="app.setSwitchPause(true)">4s Auto</button>
+          <button id="switchpause-off" class="seg-btn" onclick="app.setSwitchPause(false)">Direct</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Sauvegarde & Base de données (LocalStorage / SQLite)</div>
+      <div class="card-subtitle" style="margin-bottom:14px;">
+        Vos données sont enregistrées automatiquement sur votre Pixel 10 Pro (`LocalStorage` + `IndexedDB`). Vous pouvez exporter votre base à tout moment.
+      </div>
+      <div style="display:flex; flex-direction:column; gap:10px;">
+        <button class="btn-secondary" onclick="app.exportJSON()">
+          📥 Exporter ma sauvegarde (.json)
+        </button>
+        <button class="btn-secondary" onclick="app.exportSQL()">
+          🗄️ Exporter en script SQLite (.sql)
+        </button>
+        <label class="btn-secondary" style="cursor:pointer;">
+          📤 Importer une sauvegarde (.json)
+          <input type="file" accept=".json" style="display:none;" onchange="app.importJSON(event)" />
+        </label>
+        <button class="btn-secondary" style="color:var(--coral); border-color:rgba(244,63,94,0.35);" onclick="app.resetDataPrompt()">
+          🗑️ Réinitialiser les données
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- BOTTOM NAVIGATION -->
+  <nav class="bottom-nav">
+    <button class="nav-item active" id="nav-today" onclick="app.switchView('today')">
+      <span class="nav-icon">⏱️</span>
+      <span>Séance</span>
+    </button>
+    <button class="nav-item" id="nav-library" onclick="app.switchView('library')">
+      <span class="nav-icon">🤸</span>
+      <span>Exercices</span>
+    </button>
+    <button class="nav-item" id="nav-progress" onclick="app.switchView('progress')">
+      <span class="nav-icon">📈</span>
+      <span>Suivi</span>
+    </button>
+    <button class="nav-item" id="nav-settings" onclick="app.switchView('settings')">
+      <span class="nav-icon">⚙️</span>
+      <span>Données</span>
+    </button>
+  </nav>
+</div>
+
+<!-- ==========================================
+     FULLSCREEN WORKOUT PLAYER OVERLAY
+     ========================================== -->
+<div id="playerOverlay" class="player-overlay">
+  <div class="player-top">
+    <button class="icon-btn" onclick="app.confirmExitWorkout()" title="Quitter">✕</button>
+    <div style="text-align:center;">
+      <div id="playerHeaderTitle" style="font-size:13px; font-weight:800;">Séance A • Tour 1/3</div>
+      <div id="wakeLockIndicator" style="font-size:10px; color:var(--emerald);">🔆 Écran actif • Audio prêt</div>
+    </div>
+    <div style="display:flex; gap:6px;">
+      <button id="playerMuteBtn" class="icon-btn active-toggle" onclick="app.togglePlayerSound()" title="Son">🔊</button>
+    </div>
+  </div>
+
+  <!-- Step Dots -->
+  <div id="playerDots" class="step-progress-bar"></div>
+
+  <!-- Phase Banner -->
+  <div id="playerPhaseBanner" class="phase-banner phase-prep">PRÉPARATION — MISE EN PLACE</div>
+
+  <!-- Animated SVG Stage -->
+  <div class="player-stage">
+    <span id="playerEquipBadge" class="equip-badge">Poutre</span>
+    <span id="playerSideBadge" class="side-badge" style="display:none;">CÔTÉ GAUCHE</span>
+    <div id="playerSvgHolder" class="player-svg-container"></div>
+    <div id="playerExoTitle" class="player-exo-title">Suspension Poutre – Relevés</div>
+    <div id="playerExoVariant" class="player-exo-variant">Niveau 1 : Genoux groupés + blocage 2s</div>
+  </div>
+
+  <!-- Circular Timer & Tempo Metronome -->
+  <div class="timer-section">
+    <div class="timer-ring-wrap">
+      <svg class="timer-ring-svg" viewBox="0 0 120 120">
+        <circle class="timer-ring-bg" cx="60" cy="60" r="50"></circle>
+        <circle id="timerRingFg" class="timer-ring-fg" cx="60" cy="60" r="50" stroke-dasharray="314.16" stroke-dashoffset="0"></circle>
+      </svg>
+      <div class="timer-digits">
+        <span id="timerSecText" class="timer-sec">05</span>
+        <span id="timerUnitText" class="timer-unit">SEC</span>
+      </div>
+    </div>
+
+    <div class="tempo-box">
+      <div id="tempoCurrentAction" class="tempo-current-action">🎯 Mettez-vous en position</div>
+      <div class="tempo-phases-bar" id="tempoPhasesBar">
+        <div id="tempoSegUp" class="tempo-seg"></div>
+        <div id="tempoSegHold" class="tempo-seg"></div>
+        <div id="tempoSegDown" class="tempo-seg"></div>
+      </div>
+      <div id="playerCuesList" class="cues-list"></div>
+    </div>
+  </div>
+
+  <!-- Controls -->
+  <div class="player-controls">
+    <button class="ctrl-btn" onclick="app.adjustTimer(-10)" title="Passer 10s / +Repos" id="btnPlusRest">+10s</button>
+    <button id="btnPlayPause" class="ctrl-btn main-pause" onclick="app.togglePause()">⏸ PAUSE</button>
+    <button class="ctrl-btn" onclick="app.nextStep()">PASSER ⏭</button>
+  </div>
+</div>
+
+<!-- ==========================================
+     MODAL: END OF WORKOUT RPE & SUMMARY
+     ========================================== -->
+<div id="finishModal" class="modal-backdrop">
+  <div class="modal-card">
+    <div style="text-align:center;">
+      <div style="font-size:38px; margin-bottom:4px;">🧗‍♂️🔥</div>
+      <div style="font-size:20px; font-weight:900;">Séance Terminée !</div>
+      <div id="finishSummarySub" style="font-size:13px; color:var(--text-muted); margin-top:4px;">Séance A • 3 tours complétés</div>
+    </div>
+
+    <div class="status-grid">
+      <div class="stat-box" style="text-align:center;">
+        <span class="stat-label">Durée Totale</span>
+        <div class="stat-value" style="justify-content:center;" id="finishDurationVal">14 min</div>
+      </div>
+      <div class="stat-box" style="text-align:center;">
+        <span class="stat-label">Temps sous Tension</span>
+        <div class="stat-value" style="justify-content:center; color:var(--emerald);" id="finishTutVal">7m 30s</div>
+      </div>
+    </div>
+
+    <div>
+      <div style="font-size:13px; font-weight:700; margin-bottom:8px; text-align:center;">Comment avez-vous ressenti cette séance ?</div>
+      <div class="rpe-grid">
+        <button class="rpe-btn" id="rpe-easy" onclick="app.selectRPE('easy')">
+          <span style="font-size:22px;">😎</span>
+          <span>Facile</span>
+          <span style="font-size:10px; color:var(--text-muted);">Marge confort</span>
+        </button>
+        <button class="rpe-btn selected" id="rpe-good" onclick="app.selectRPE('good')">
+          <span style="font-size:22px;">🎯</span>
+          <span>Juste bien</span>
+          <span style="font-size:10px; color:var(--text-muted);">Gainage intense</span>
+        </button>
+        <button class="rpe-btn" id="rpe-hard" onclick="app.selectRPE('hard')">
+          <span style="font-size:22px;">🥵</span>
+          <span>Très dur</span>
+          <span style="font-size:10px; color:var(--text-muted);">Échec postural</span>
+        </button>
+      </div>
+    </div>
+
+    <div id="adaptiveFeedbackBox" style="font-size:12px; color:var(--emerald); background:rgba(16,185,129,0.1); border:1px solid rgba(16,185,129,0.3); padding:10px; border-radius:10px; text-align:center;">
+      Progression idéale ! Prochaine séance recommandée : Séance B.
+    </div>
+
+    <button class="btn-primary" onclick="app.saveFinishedWorkout()">✅ ENREGISTRER LA SÉANCE</button>
+  </div>
+</div>
+
+<!-- ==========================================
+     MODAL: EXERCISE DETAIL INSPECTOR
+     ========================================== -->
+<div id="exoDetailModal" class="modal-backdrop" onclick="if(event.target===this) app.closeExoModal()">
+  <div class="modal-card">
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      <span id="modalExoTag" class="pill emerald">Séance A</span>
+      <button class="icon-btn" style="width:32px; height:32px;" onclick="app.closeExoModal()">✕</button>
+    </div>
+    <div id="modalExoTitle" style="font-size:18px; font-weight:800;"></div>
+    <div id="modalExoSvg" class="player-svg-container" style="background:#080b12; border-radius:12px; border:1px solid var(--border); height:170px;"></div>
+    <div id="modalExoClimbWhy" style="font-size:13px; color:var(--cyan); background:rgba(6,182,212,0.1); border:1px solid rgba(6,182,212,0.3); padding:10px; border-radius:10px;"></div>
+    <div>
+      <div style="font-size:12px; font-weight:800; color:var(--text-muted); margin-bottom:6px;">POINTS CLÉS D'EXÉCUTION :</div>
+      <div id="modalExoCues" class="cues-list"></div>
+    </div>
+    <div>
+      <div style="font-size:12px; font-weight:800; color:var(--text-muted); margin-bottom:6px;">PROGRESSION (NIVEAUX 1 À 4) :</div>
+      <div id="modalExoLevels" style="display:flex; flex-direction:column; gap:6px; font-size:12px;"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+/**
+ * CLIMBCORE 7a+ — APPLICATION COMPLÈTE AUTONOME
+ * Conçue pour Pixel 10 Pro (HTML5 / CSS3 / SVG / Web Audio / WakeLock / LocalStorage + IndexedDB + SQLite Export)
+ */
+
+const SVG_GRAPHICS = {
+  warmup_catcow: `
+    <svg viewBox="0 0 240 150" fill="none">
+      <line x1="20" y1="130" x2="220" y2="130" stroke="#334155" stroke-width="4" stroke-linecap="round"/>
+      <rect x="45" y="126" width="150" height="5" rx="2.5" fill="#06b6d4" opacity="0.5"/>
+      <g class="anim-arch">
+        <path d="M85 95 Q120 68 155 95" stroke="#10b981" stroke-width="10" stroke-linecap="round" class="muscle-heat"/>
+        <circle cx="170" cy="88" r="11" fill="#e2e8f0"/>
+        <line x1="152" y1="95" x2="158" y2="126" stroke="#cbd5e1" stroke-width="6" stroke-linecap="round"/>
+        <line x1="88" y1="95" x2="82" y2="126" stroke="#cbd5e1" stroke-width="6" stroke-linecap="round"/>
+        <line x1="82" y1="126" x2="62" y2="126" stroke="#94a3b8" stroke-width="5" stroke-linecap="round"/>
+      </g>
+      <text x="120" y="25" fill="#94a3b8" font-size="10" text-anchor="middle" font-weight="bold">MOBILITÉ RACHIS & BASSIN</text>
+    </svg>`,
+
+  warmup_deadbug: `
+    <svg viewBox="0 0 240 150" fill="none">
+      <line x1="20" y1="128" x2="220" y2="128" stroke="#334155" stroke-width="4"/>
+      <rect x="40" y="124" width="160" height="5" rx="2.5" fill="#10b981" opacity="0.5"/>
+      <circle cx="68" cy="112" r="11" fill="#e2e8f0"/>
+      <line x1="82" y1="118" x2="132" y2="118" stroke="#10b981" stroke-width="11" stroke-linecap="round" class="muscle-heat"/>
+      <line x1="92" y1="114" x2="92" y2="72" stroke="#cbd5e1" stroke-width="5" stroke-linecap="round"/>
+      <g class="anim-deadbug-leg">
+        <line x1="130" y1="116" x2="132" y2="82" stroke="#cbd5e1" stroke-width="6" stroke-linecap="round"/>
+        <line x1="132" y1="82" x2="165" y2="82" stroke="#cbd5e1" stroke-width="5" stroke-linecap="round"/>
+      </g>
+      <text x="120" y="24" fill="#34d399" font-size="10" text-anchor="middle" font-weight="bold">LOMBAIRES PLAQUÉES AU SOL</text>
+    </svg>`,
+
+  a1_hang_raises: `
+    <svg viewBox="0 0 240 150" fill="none">
+      <!-- Hangboard / Poutre -->
+      <rect x="70" y="8" width="100" height="16" rx="4" fill="#b45309" stroke="#f59e0b" stroke-width="2"/>
+      <line x1="105" y1="24" x2="108" y2="54" stroke="#cbd5e1" stroke-width="5" stroke-linecap="round"/>
+      <line x1="135" y1="24" x2="132" y2="54" stroke="#cbd5e1" stroke-width="5" stroke-linecap="round"/>
+      <circle cx="120" cy="46" r="10" fill="#e2e8f0"/>
+      <!-- Torso & Core Heatmap -->
+      <line x1="120" y1="58" x2="120" y2="94" stroke="#475569" stroke-width="12" stroke-linecap="round"/>
+      <line x1="120" y1="64" x2="120" y2="94" stroke="#f43f5e" stroke-width="8" stroke-linecap="round" class="muscle-heat"/>
+      <!-- Animated Legs -->
+      <g class="anim-legs-hang">
+        <line x1="120" y1="92" x2="122" y2="122" stroke="#e2e8f0" stroke-width="7" stroke-linecap="round"/>
+        <line x1="122" y1="122" x2="126" y2="144" stroke="#cbd5e1" stroke-width="6" stroke-linecap="round"/>
+        <circle cx="127" cy="144" r="4" fill="#10b981"/>
+      </g>
+      <path d="M148 125 A 38 38 0 0 0 158 75" stroke="#10b981" stroke-width="2" stroke-dasharray="3 3"/>
+      <text x="190" y="85" fill="#10b981" font-size="10" font-weight="bold">BLOQUER 2s</text>
+    </svg>`,
+
+  a2_hollow_hold: `
+    <svg viewBox="0 0 240 150" fill="none">
+      <line x1="15" y1="126" x2="225" y2="126" stroke="#334155" stroke-width="4"/>
+      <g class="anim-hollow">
+        <!-- Arms + Dumbbell -->
+        <line x1="78" y1="102" x2="42" y2="78" stroke="#cbd5e1" stroke-width="5" stroke-linecap="round"/>
+        <rect x="34" y="70" width="14" height="8" rx="2" fill="#f59e0b"/>
+        <circle cx="72" cy="96" r="10" fill="#e2e8f0"/>
+        <!-- Curved Banana Core -->
+        <path d="M80 108 Q118 126 152 108" stroke="#f43f5e" stroke-width="11" stroke-linecap="round" class="muscle-heat"/>
+        <!-- Extended Legs -->
+        <line x1="150" y1="108" x2="202" y2="82" stroke="#e2e8f0" stroke-width="7" stroke-linecap="round"/>
+      </g>
+      <text x="120" y="34" fill="#fbbf24" font-size="10" text-anchor="middle" font-weight="bold">BANANE STRICTE • ZÉRO CREUX LOMBAIRE</text>
+    </svg>`,
+
+  a3_wipers: `
+    <svg viewBox="0 0 240 150" fill="none">
+      <!-- Top-down / angled view of windshield wipers -->
+      <ellipse cx="120" cy="115" rx="75" ry="14" fill="#111827" stroke="#334155" stroke-width="2"/>
+      <circle cx="120" cy="82" r="10" fill="#e2e8f0"/>
+      <line x1="75" y1="98" x2="165" y2="98" stroke="#94a3b8" stroke-width="5" stroke-linecap="round"/>
+      <!-- Obliques glow -->
+      <ellipse cx="120" cy="108" rx="16" ry="9" fill="#f43f5e" class="muscle-heat"/>
+      <g class="anim-wiper">
+        <line x1="120" y1="112" x2="120" y2="45" stroke="#e2e8f0" stroke-width="8" stroke-linecap="round"/>
+        <circle cx="120" cy="43" r="5" fill="#10b981"/>
+      </g>
+      <path d="M75 55 Q120 30 165 55" stroke="#38bdf8" stroke-width="2" stroke-dasharray="4 3"/>
+      <text x="120" y="24" fill="#38bdf8" font-size="10" text-anchor="middle" font-weight="bold">CONTRÔLE ANTI-ROTATION BASSIN</text>
+    </svg>`,
+
+  a4_glute_bridge: `
+    <svg viewBox="0 0 240 150" fill="none">
+      <line x1="20" y1="128" x2="220" y2="128" stroke="#334155" stroke-width="4"/>
+      <circle cx="56" cy="116" r="10" fill="#e2e8f0"/>
+      <g class="anim-bridge">
+        <!-- Torso + Glutes heat -->
+        <line x1="68" y1="120" x2="132" y2="92" stroke="#10b981" stroke-width="11" stroke-linecap="round" class="muscle-heat"/>
+        <circle cx="128" cy="94" r="9" fill="#f43f5e" class="muscle-heat"/>
+        <!-- Supporting leg -->
+        <line x1="132" y1="92" x2="158" y2="126" stroke="#cbd5e1" stroke-width="6" stroke-linecap="round"/>
+        <!-- Extended single leg -->
+        <line x1="132" y1="92" x2="192" y2="64" stroke="#e2e8f0" stroke-width="6" stroke-linecap="round"/>
+      </g>
+      <text x="120" y="26" fill="#10b981" font-size="10" text-anchor="middle" font-weight="bold">POUSSÉE ORTEILS & FESSIERS EN DÉVERS</text>
+    </svg>`,
+
+  b1_pallof_press: `
+    <svg viewBox="0 0 240 150" fill="none">
+      <!-- Anchor Pillar -->
+      <rect x="18" y="25" width="10" height="105" rx="3" fill="#475569"/>
+      <!-- Elastic Band -->
+      <g class="anim-pallof">
+        <line x1="28" y1="76" x2="136" y2="76" stroke="#f59e0b" stroke-width="3.5" stroke-dasharray="6 3"/>
+        <circle cx="138" cy="76" r="6" fill="#10b981"/>
+      </g>
+      <!-- Climber Body -->
+      <circle cx="120" cy="44" r="11" fill="#e2e8f0"/>
+      <line x1="120" y1="56" x2="120" y2="100" stroke="#3b82f6" stroke-width="12" stroke-linecap="round" class="muscle-heat"/>
+      <line x1="120" y1="100" x2="106" y2="130" stroke="#cbd5e1" stroke-width="6" stroke-linecap="round"/>
+      <line x1="120" y1="100" x2="134" y2="130" stroke="#cbd5e1" stroke-width="6" stroke-linecap="round"/>
+      <g class="anim-pallof">
+        <line x1="120" y1="68" x2="138" y2="76" stroke="#e2e8f0" stroke-width="5" stroke-linecap="round"/>
+      </g>
+      <text x="135" y="24" fill="#fbbf24" font-size="10" text-anchor="middle" font-weight="bold">RÉSISTER À LA TRACTION LATÉRALE</text>
+    </svg>`,
+
+  b2_side_plank: `
+    <svg viewBox="0 0 240 150" fill="none">
+      <line x1="20" y1="128" x2="220" y2="128" stroke="#334155" stroke-width="4"/>
+      <!-- Bench/Box for Copenhagen -->
+      <rect x="172" y="96" width="36" height="32" rx="4" fill="#1e293b" stroke="#475569" stroke-width="2"/>
+      <g class="anim-hollow">
+        <circle cx="52" cy="82" r="10" fill="#e2e8f0"/>
+        <line x1="65" y1="90" x2="65" y2="126" stroke="#cbd5e1" stroke-width="6" stroke-linecap="round"/>
+        <!-- Oblique + Adductor Line -->
+        <line x1="65" y1="90" x2="182" y2="96" stroke="#3b82f6" stroke-width="11" stroke-linecap="round" class="muscle-heat"/>
+        <line x1="120" y1="94" x2="165" y2="114" stroke="#94a3b8" stroke-width="5" stroke-linecap="round"/>
+      </g>
+      <text x="120" y="28" fill="#60a5fa" font-size="10" text-anchor="middle" font-weight="bold">OBLIQUES & ADDUCTEURS (CROCHETAGES)</text>
+    </svg>`,
+
+  b3_elastic_deadbug: `
+    <svg viewBox="0 0 240 150" fill="none">
+      <line x1="15" y1="128" x2="225" y2="128" stroke="#334155" stroke-width="4"/>
+      <rect x="20" y="75" width="8" height="53" fill="#475569"/>
+      <!-- Elastic pulling hands -->
+      <line x1="28" y1="84" x2="96" y2="74" stroke="#f59e0b" stroke-width="3" stroke-dasharray="5 3"/>
+      <circle cx="66" cy="112" r="10" fill="#e2e8f0"/>
+      <line x1="78" y1="118" x2="132" y2="118" stroke="#3b82f6" stroke-width="11" stroke-linecap="round" class="muscle-heat"/>
+      <line x1="94" y1="114" x2="96" y2="74" stroke="#e2e8f0" stroke-width="5" stroke-linecap="round"/>
+      <g class="anim-deadbug-leg">
+        <line x1="132" y1="118" x2="185" y2="92" stroke="#e2e8f0" stroke-width="6" stroke-linecap="round"/>
+      </g>
+      <line x1="132" y1="118" x2="135" y2="85" stroke="#94a3b8" stroke-width="5" stroke-linecap="round"/>
+      <text x="125" y="26" fill="#f59e0b" font-size="10" text-anchor="middle" font-weight="bold">TENSION BRAS + EXTENSION JAMBE</text>
+    </svg>`,
+
+  b4_renegade_row: `
+    <svg viewBox="0 0 240 150" fill="none">
+      <line x1="20" y1="128" x2="220" y2="128" stroke="#334155" stroke-width="4"/>
+      <circle cx="62" cy="76" r="10" fill="#e2e8f0"/>
+      <!-- Plank Body -->
+      <line x1="74" y1="84" x2="188" y2="118" stroke="#3b82f6" stroke-width="11" stroke-linecap="round" class="muscle-heat"/>
+      <!-- Supporting arm on dumbbell -->
+      <line x1="82" y1="86" x2="82" y2="122" stroke="#cbd5e1" stroke-width="5" stroke-linecap="round"/>
+      <rect x="74" y="121" width="16" height="7" rx="2" fill="#f59e0b"/>
+      <!-- Rowing arm with dumbbell -->
+      <g class="anim-row-arm">
+        <line x1="92" y1="88" x2="104" y2="104" stroke="#e2e8f0" stroke-width="6" stroke-linecap="round"/>
+        <rect x="96" y="102" width="16" height="8" rx="2" fill="#10b981"/>
+      </g>
+      <text x="120" y="28" fill="#34d399" font-size="10" text-anchor="middle" font-weight="bold">TIRAGE LOURD SANS VRILLER LE BASSIN</text>
+    </svg>`,
+
+  c1_long_lever_plank: `
+    <svg viewBox="0 0 240 150" fill="none">
+      <line x1="15" y1="128" x2="225" y2="128" stroke="#334155" stroke-width="4"/>
+      <g class="anim-hollow">
+        <circle cx="72" cy="88" r="10" fill="#e2e8f0"/>
+        <!-- Far forward elbows -->
+        <line x1="82" y1="94" x2="52" y2="124" stroke="#e2e8f0" stroke-width="6" stroke-linecap="round"/>
+        <line x1="52" y1="124" x2="32" y2="124" stroke="#e2e8f0" stroke-width="6" stroke-linecap="round"/>
+        <!-- Rigid Core -->
+        <line x1="82" y1="94" x2="196" y2="118" stroke="#10b981" stroke-width="11" stroke-linecap="round" class="muscle-heat"/>
+      </g>
+      <path d="M52 112 L82 112" stroke="#f59e0b" stroke-width="2"/>
+      <text x="120" y="28" fill="#10b981" font-size="10" text-anchor="middle" font-weight="bold">COUDES AVANCÉS • BRAS DE LEVIER MAX</text>
+    </svg>`,
+
+  c2_lsit_hang: `
+    <svg viewBox="0 0 240 150" fill="none">
+      <rect x="70" y="8" width="100" height="16" rx="4" fill="#b45309" stroke="#f59e0b" stroke-width="2"/>
+      <line x1="112" y1="24" x2="116" y2="56" stroke="#cbd5e1" stroke-width="5" stroke-linecap="round"/>
+      <line x1="128" y1="24" x2="124" y2="56" stroke="#cbd5e1" stroke-width="5" stroke-linecap="round"/>
+      <circle cx="120" cy="48" r="10" fill="#e2e8f0"/>
+      <line x1="120" y1="60" x2="120" y2="98" stroke="#10b981" stroke-width="11" stroke-linecap="round" class="muscle-heat"/>
+      <!-- L-Sit horizontal legs -->
+      <g class="anim-hollow">
+        <line x1="120" y1="96" x2="178" y2="96" stroke="#e2e8f0" stroke-width="7" stroke-linecap="round"/>
+        <circle cx="180" cy="96" r="4" fill="#f59e0b"/>
+      </g>
+      <text x="165" y="78" fill="#fbbf24" font-size="10" font-weight="bold">90° CONTINU</text>
+    </svg>`,
+
+  c3_superman_arch: `
+    <svg viewBox="0 0 240 150" fill="none">
+      <line x1="15" y1="128" x2="225" y2="128" stroke="#334155" stroke-width="4"/>
+      <g class="anim-arch">
+        <path d="M45 90 Q120 132 195 90" stroke="#10b981" stroke-width="11" stroke-linecap="round" class="muscle-heat"/>
+        <circle cx="64" cy="92" r="10" fill="#e2e8f0"/>
+      </g>
+      <text x="120" y="28" fill="#34d399" font-size="10" text-anchor="middle" font-weight="bold">CHAÎNE POSTÉRIEURE (LOMBAIRES & FESSIERS)</text>
+    </svg>`,
+
+  c4_farmer_carry: `
+    <svg viewBox="0 0 240 150" fill="none">
+      <line x1="40" y1="134" x2="200" y2="134" stroke="#334155" stroke-width="4"/>
+      <circle cx="120" cy="34" r="11" fill="#e2e8f0"/>
+      <!-- Upright spine + anti-lateral flexion oblique glow -->
+      <line x1="120" y1="48" x2="120" y2="94" stroke="#475569" stroke-width="14" stroke-linecap="round"/>
+      <line x1="114" y1="52" x2="114" y2="92" stroke="#10b981" stroke-width="6" stroke-linecap="round" class="muscle-heat"/>
+      <!-- Arms (one carrying heavy dumbbell) -->
+      <line x1="108" y1="54" x2="98" y2="88" stroke="#cbd5e1" stroke-width="5" stroke-linecap="round"/>
+      <line x1="132" y1="54" x2="136" y2="92" stroke="#e2e8f0" stroke-width="6" stroke-linecap="round"/>
+      <rect x="126" y="92" width="22" height="12" rx="3" fill="#f59e0b" stroke="#fde68a" stroke-width="1.5"/>
+      <!-- Legs -->
+      <line x1="115" y1="94" x2="110" y2="132" stroke="#cbd5e1" stroke-width="6" stroke-linecap="round"/>
+      <line x1="125" y1="94" x2="130" y2="132" stroke="#cbd5e1" stroke-width="6" stroke-linecap="round"/>
+      <text x="120" y="18" fill="#fbbf24" font-size="10" text-anchor="middle" font-weight="bold">VALISE LOURDE • BUSTE 100% VERTICAL</text>
+    </svg>`
+};
+
+const LEVELS_CONFIG = {
+  1: {
+    level: 1,
+    weeks: "Semaines 1–2",
+    name: "Fondation & Contrôle",
+    defaultRounds: 3,
+    workSec: 30,
+    restSec: 20,
+    workSecC: 35,
+    restSecC: 15,
+    desc: "Maîtrise de la rétroversion du bassin et des pauses isométriques de 2s."
+  },
+  2: {
+    level: 2,
+    weeks: "Semaines 3–4",
+    name: "Volume & Blocage 2s",
+    defaultRounds: 4,
+    workSec: 40,
+    restSec: 20,
+    workSecC: 40,
+    restSecC: 15,
+    desc: "Augmentation du temps sous tension (40s) et passage à 4 tours."
+  },
+  3: {
+    level: 3,
+    weeks: "Semaines 5–6",
+    name: "Bras de Levier & Charge",
+    defaultRounds: 4,
+    workSec: 40,
+    restSec: 20,
+    workSecC: 45,
+    restSecC: 15,
+    desc: "Extensions jambes tendues sur poutre/sol, élastique fort et haltère lourd."
+  },
+  4: {
+    level: 4,
+    weeks: "Semaines 7–8",
+    name: "Densité Falaise (Crux)",
+    defaultRounds: 4,
+    workSec: 45,
+    restSec: 15,
+    workSecC: 50,
+    restSecC: 15,
+    desc: "Effort long (45-50s) et récupération courte (15s) pour enchaîner dans le 7a."
+  }
+};
+
+const EXERCISES_DB = [
+  // WARMUP
+  {
+    id: "w1",
+    session: "WARMUP",
+    name: "Cat-Cow & Scapula Push",
+    equipment: "Tapis",
+    unilateral: false,
+    type: "dynamic",
+    tempo: [2, 1, 2],
+    tempoLabels: ["⬆️ Arrondir le dos (2s)", "🔒 Rétroversion (1s)", "⬇️ Creuser contrôlé (2s)"],
+    svg: "warmup_catcow",
+    climbWhy: "Déverrouille la colonne thoracique et prépare l'enroulement du bassin nécessaire en dévers.",
+    cues: [
+      "Pousser fort dans les paumes pour écarter les omoplates",
+      "Enrouler le coccyx vers le nombril",
+      "Respiration fluide et profonde"
+    ],
+    variants: {
+      1: "À quatre pattes, rythme fluide",
+      2: "Genoux décollés de 2 cm en fin d'arrondi",
+      3: "Genoux décollés (Bear stance) sur tout le mouvement",
+      4: "Bear stance + maintien 3s en rétroversion"
+    }
+  },
+  {
+    id: "w2",
+    session: "WARMUP",
+    name: "Dead Bug d'Activation",
+    equipment: "Tapis",
+    unilateral: false,
+    type: "dynamic",
+    tempo: [3, 2, 2],
+    tempoLabels: ["⬇️ Étendre bras/jambe opposés (3s)", "🔒 Plaquer lombaires (2s)", "⬆️ Revenir au centre (2s)"],
+    svg: "warmup_deadbug",
+    climbWhy: "Active le transverse profond avant de charger sur la poutre ou les haltères.",
+    cues: [
+      "Écraser le bas du dos contre le tapis (zéro espace)",
+      "Expirer à fond pendant l'extension de la jambe",
+      "Mouvement lent et contrôlé"
+    ],
+    variants: {
+      1: "Extension jambe fléchie à 45°",
+      2: "Extension jambe tendue + bras opposé",
+      3: "Extension + pause 2s au ras du sol",
+      4: "Haltère léger tenu dans les mains"
+    }
+  },
+
+  // SESSION A
+  {
+    id: "a1",
+    session: "A",
+    name: "Suspension Poutre – Relevés & Arrêt 2s",
+    equipment: "Poutre (Bacs)",
+    unilateral: false,
+    type: "dynamic",
+    tempo: [2, 2, 3],
+    tempoLabels: ["⬆️ Monter pieds/genoux (2s)", "🔒 BLOQUER HAUT (2s)", "⬇️ Descente freinée (3s)"],
+    svg: "a1_hang_raises",
+    climbWhy: "Reproduit exactement l'action de remonter et fixer un pied haut dans un gros dévers sans zipper.",
+    cues: [
+      "Épaules engagées (omoplates basses, pas pendu sur les ligaments)",
+      "Enrouler le bassin en haut et BLOQUER 2 secondes",
+      "Freiner la descente sur 3 secondes sans aucun balancier"
+    ],
+    variants: {
+      1: "Genoux groupés à la poitrine + blocage 2s en haut",
+      2: "Montée genoux, extension à l'horizontale en haut + descente jambes mi-tendues",
+      3: "Jambes tendues (Toes-to-bar / L-raise) avec arrêt strict de 2s",
+      4: "Jambes tendues vers prise haute gauche puis droite (essuie-glace suspendu)"
+    }
+  },
+  {
+    id: "a2",
+    session: "A",
+    name: "Hollow Body Hold (La Banane)",
+    equipment: "Tapis + Haltère (opt.)",
+    unilateral: false,
+    type: "isometric",
+    tempo: null,
+    svg: "a2_hollow_hold",
+    climbWhy: "Base fondamentale de la tension corporelle entre les mains et les pieds en toit et dévers.",
+    cues: [
+      "Lombaires collées à 100% contre le tapis (priorité absolue)",
+      "Omoplates décollées du sol, côtes rentrées",
+      "Si le bas du dos se cambre, pliez légèrement un genou"
+    ],
+    variants: {
+      1: "Bras tendus le long du corps, jambes à 45° (ou 1 genou groupé)",
+      2: "Bras tendus derrière les oreilles, jambes tendues à 30°",
+      3: "Bras derrière la tête avec 1 haltère léger (2 à 4 kg)",
+      4: "Hollow Rocks (bascule contrôlée en banane rigide avec haltère)"
+    }
+  },
+  {
+    id: "a3",
+    session: "A",
+    name: "Essuie-glaces au sol (Windshield Wipers)",
+    equipment: "Tapis",
+    unilateral: false,
+    type: "dynamic",
+    tempo: [2, 1, 2],
+    tempoLabels: ["↙️ Descendre sur le côté (2s)", "🔒 Bloquer sans poser (1s)", "⬆️ Remonter par les obliques (2s)"],
+    svg: "a3_wipers",
+    climbWhy: "Permet de contrôler la rotation du bassin lors des lolottes profondes, grands croisés et mouvements en drapeau.",
+    cues: [
+      "Les deux épaules restent clouées au sol",
+      "Descendre jusqu'à l'angle contrôlable sans décoller l'omoplate opposée",
+      "Tirer avec les obliques pour ramener les jambes au centre"
+    ],
+    variants: {
+      1: "Genoux pliés à 90°, amplitude contrôlée G/D",
+      2: "Jambes semi-tendues, pause 1s à 10 cm du sol",
+      3: "Jambes 100% tendues, contrôle lent",
+      4: "Jambes tendues + léger haltère serré entre les chevilles ou Russian Twist lourd"
+    }
+  },
+  {
+    id: "a4",
+    session: "A",
+    name: "Pont Fessier Unilatéral (Single-Leg Bridge)",
+    equipment: "Tapis + Haltère (opt.)",
+    unilateral: true,
+    type: "dynamic",
+    tempo: [2, 2, 2],
+    tempoLabels: ["⬆️ Pousser le bassin haut (2s)", "🔒 Verrouiller fessier (2s)", "⬇️ Redescendre lentement (2s)"],
+    svg: "a4_glute_bridge",
+    climbWhy: "Connecte l'arrière des cuisses, les fessiers et les lombaires pour continuer à pousser fort sur les grattons de pieds en dévers.",
+    cues: [
+      "Aligner genou, hanche et épaule en haut sans cambrer les lombaires",
+      "Garder le bassin horizontal (la hanche libre ne doit pas tomber)",
+      "Changement de jambe au signal sonore de mi-temps"
+    ],
+    variants: {
+      1: "Au poids du corps, pause de 2s en haut sur chaque répétition",
+      2: "Maintien isométrique continu en haut sur une jambe",
+      3: "Avec haltère posé sur la hanche, répétitions contrôlées (2s pause)",
+      4: "Pied d'appui surélevé ou haltère lourd + maintien isométrique"
+    }
+  },
+
+  // SESSION B
+  {
+    id: "b1",
+    session: "B",
+    name: "Pallof Press avec Élastique",
+    equipment: "Élastique (accroché poutre/support)",
+    unilateral: true,
+    type: "dynamic",
+    tempo: [2, 3, 2],
+    tempoLabels: ["➡️ Tendre les bras devant (2s)", "🔒 RÉSISTER À LA ROTATION (3s)", "⬅️ Ramener au sternum (2s)"],
+    svg: "b1_pallof_press",
+    climbWhy: "Exercice roi d'anti-rotation : empêche le corps de faire « porte de grange » (barn-door) quand vous lâchez une main ou un pied.",
+    cues: [
+      "Placé de profil par rapport au point d'attache de l'élastique",
+      "Quand les bras se tendent, les épaules et le nombril ne bougent pas d'un millimètre",
+      "Changer de côté au bip de mi-temps"
+    ],
+    variants: {
+      1: "Debout pieds largeur d'épaules, tension élastique moyenne",
+      2: "Position fente (chevalier servant) ou pieds serrés, pause 3s bras tendus",
+      3: "Élastique fort + élévation des bras tendus de 20 cm vers le haut",
+      4: "Isométrie bras tendus + petits cercles lents sans bouger le buste"
+    }
+  },
+  {
+    id: "b2",
+    session: "B",
+    name: "Planche Copenhague / Latérale Haltère",
+    equipment: "Tapis + Haltère (ou Chaise)",
+    unilateral: true,
+    type: "isometric",
+    tempo: null,
+    svg: "b2_side_plank",
+    climbWhy: "Renforce la chaîne latérale (obliques + adducteurs) indispensable pour les crochetages de talon et de pointe intenses.",
+    cues: [
+      "Coude directement sous l'épaule, repousser le sol",
+      "Bassin haut et aligné (ne pas casser aux hanches)",
+      "Changement de côté au bip de mi-temps"
+    ],
+    variants: {
+      1: "Planche latérale classique pieds superposés",
+      2: "Planche latérale avec un haltère tenu bras tendu vers le plafond",
+      3: "Planche Copenhague (jambe du dessus posée sur banc/chaise, jambe du dessous décollée)",
+      4: "Planche Copenhague dynamique (monter/descendre la jambe libre) ou lestée"
+    }
+  },
+  {
+    id: "b3",
+    session: "B",
+    name: "Dead Bug sous tension Élastique",
+    equipment: "Tapis + Élastique",
+    unilateral: false,
+    type: "dynamic",
+    tempo: [3, 2, 2],
+    tempoLabels: ["⬇️ Étendre une jambe au ras du sol (3s)", "🔒 Bloquer sous tension (2s)", "⬆️ Ramener le genou (2s)"],
+    svg: "b3_elastic_deadbug",
+    climbWhy: "Reproduit la tension de tirage des bras (grand dorsal + abdos) tout en déplaçant précisément un pied.",
+    cues: [
+      "Tirer l'élastique bras tendus au-dessus de la poitrine (engage les dorsaux et le haut des abdos)",
+      "Garder le bas du dos collé au sol pendant que la jambe s'allonge",
+      "Alterner jambe gauche et jambe droite"
+    ],
+    variants: {
+      1: "Tension élastique modérée, extension alternée d'une jambe",
+      2: "Tension élastique forte + arrêt de 2s jambe tendue à 5 cm du sol",
+      3: "Extension simultanée des 2 jambes (Double Leg Lowering sous élastique)",
+      4: "Double extension jambes tendues + tempo ultra-lent (4s descente)"
+    }
+  },
+  {
+    id: "b4",
+    session: "B",
+    name: "Renegade Row (Planche sur Haltères)",
+    equipment: "Tapis + Haltère(s)",
+    unilateral: false,
+    type: "dynamic",
+    tempo: [2, 1, 2],
+    tempoLabels: ["⬆️ Tirer l'haltère à la hanche (2s)", "🔒 Verrouiller bassin (1s)", "⬇️ Reposer sans bruit (2s)"],
+    svg: "b4_renegade_row",
+    climbWhy: "Force le tronc à rester 100% verrouillé sur 3 appuis pendant qu'un bras tire fort (exactement comme un blocage sur prise en dévers).",
+    cues: [
+      "Écarter les pieds un peu plus large que les épaules pour stabiliser",
+      "Les deux hanches doivent rester strictement face au sol pendant le tirage",
+      "Alterner main gauche et main droite (ou changer à mi-temps si 1 seul haltère)"
+    ],
+    variants: {
+      1: "Pieds larges, haltère modéré, zéro rotation du bassin",
+      2: "Pieds largeur d'épaules + pause de 2s coude tiré en haut",
+      3: "Pieds rapprochés + haltère lourd",
+      4: "Tirage + 3 secondes de maintien sur 3 appuis avant de reposer"
+    }
+  },
+
+  // SESSION C
+  {
+    id: "c1",
+    session: "C",
+    name: "Planche « Long Lever » (Coudes Avancés)",
+    equipment: "Tapis",
+    unilateral: false,
+    type: "isometric",
+    tempo: null,
+    svg: "c1_long_lever_plank",
+    climbWhy: "Simule l'effort de gainage extrême lors des mouvements très allongés où les mains sont loin au-dessus de la tête.",
+    cues: [
+      "Avancer les coudes de 10 à 20 cm devant la ligne des épaules",
+      "Rétroverser le bassin (serrer fort les fessiers et rentrer le nombril)",
+      "Tirer virtuellement les coudes vers les pointes de pieds"
+    ],
+    variants: {
+      1: "Coudes avancés de 10 cm devant les épaules, maintien strict",
+      2: "Coudes avancés de 15–20 cm, contraction maximale fessiers/abdos",
+      3: "Long Lever + décoller alternativement un pied de 5 cm",
+      4: "Body Saw (glisser d'avant en arrière sur les avant-bras en levier max)"
+    }
+  },
+  {
+    id: "c2",
+    session: "C",
+    name: "L-Sit / Tuck Sit Suspendu à la Poutre",
+    equipment: "Poutre (Bacs)",
+    unilateral: false,
+    type: "isometric",
+    tempo: null,
+    svg: "c2_lsit_hang",
+    climbWhy: "Apprend à respirer calmement tout en gardant les abdos et les fléchisseurs de hanche contractés sous fatigue (continuité en voie).",
+    cues: [
+      "Épaules basses et engagées sur les bacs de la poutre",
+      "Ne pas bloquer la respiration : petites inspirations/expirations thoraciques",
+      "Garder les cuisses à 90° sans laisser les genoux redescendre"
+    ],
+    variants: {
+      1: "Genoux pliés à 90° (Tuck Sit), maintien continu",
+      2: "Une jambe tendue, une jambe pliée (alterner toutes les 10s)",
+      3: "L-Sit complet les 2 jambes tendues à l'horizontale",
+      4: "L-Sit jambes tendues + battements lents (Flutter kicks)"
+    }
+  },
+  {
+    id: "c3",
+    session: "C",
+    name: "Superman Dynamique / Arch Hold",
+    equipment: "Tapis + Élastique (opt.)",
+    unilateral: false,
+    type: "dynamic",
+    tempo: [2, 2, 2],
+    tempoLabels: ["⬆️ Décoller buste & cuisses (2s)", "🔒 Tirer coudes en arrière (2s)", "⬇️ Relâcher contrôlé (2s)"],
+    svg: "c3_superman_arch",
+    climbWhy: "Équilibre la chaîne antérieure et renforce les lombaires/fessiers pour maintenir la tension d'arche et prévenir le mal de dos.",
+    cues: [
+      "Regarder le tapis (nuque longue, ne pas casser la tête en arrière)",
+      "Décoller les cuisses en contractant les fessiers",
+      "Tirer les coudes vers les côtes en haut du mouvement"
+    ],
+    variants: {
+      1: "Répétitions dynamiques avec 2s de maintien en haut",
+      2: "Arch Hold isométrique continu bras tendus devant",
+      3: "Arch Hold en tenant un élastique tendu entre les mains",
+      4: "Arch Rocks (bascule en arche rigide) ou tirage élastique derrière la nuque"
+    }
+  },
+  {
+    id: "c4",
+    session: "C",
+    name: "Farmer Carry / Valise Unilatérale",
+    equipment: "Haltère Lourd",
+    unilateral: true,
+    type: "isometric",
+    tempo: null,
+    svg: "c4_farmer_carry",
+    climbWhy: "Développe l'endurance des obliques profonds (carré des lombes) et la posture sous charge asymétrique.",
+    cues: [
+      "Tenir un haltère lourd d'un seul côté sans qu'il touche la cuisse",
+      "Le buste reste 100% droit (interdiction de pencher ni vers l'haltère, ni à l'opposé)",
+      "Marcher lentement sur place ou dans la pièce en serrant la sangle abdominale"
+    ],
+    variants: {
+      1: "Debout ou marche lente avec haltère modéré/lourd",
+      2: "Marche lente avec montée de genou (pause 1s sur un pied à chaque pas)",
+      3: "Haltère lourd + élévations sur pointes de pieds (mollets + gainage)",
+      4: "Waiter Carry / Rack Carry (haltère porté à l'épaule ou bras tendu au-dessus de la tête)"
+    }
+  }
+];
+
+const SESSIONS_META = {
+  A: {
+    id: "A",
+    title: "Séance A : Tenue de pieds & Dévers",
+    goal: "Suspension poutre, compression abdos/psoas et maintien des pieds hauts.",
+    equip: ["Poutre (Bacs)", "Tapis", "Haltère (opt.)"],
+    color: "coral"
+  },
+  B: {
+    id: "B",
+    title: "Séance B : Anti-Rotation & Transfert Croisé",
+    goal: "Rigidité des obliques et du bassin lors des croisés, lolottes et lâchers de main.",
+    equip: ["Élastique", "Tapis", "Haltère"],
+    color: "blue"
+  },
+  C: {
+    id: "C",
+    title: "Séance C : Continuité & Résistance Falaise",
+    goal: "Endurance de gainage sous fatigue pour tenir la tension jusqu'au relais.",
+    equip: ["Poutre (Bacs)", "Tapis", "Haltère lourd"],
+    color: "emerald"
+  }
+};
+
+/* ==========================================
+   WEB AUDIO SYNTHESIZER & HAPTICS
+   ========================================== */
+class SoundEngine {
+  constructor() {
+    this.ctx = null;
+    this.enabled = true;
+    this.metronomeEnabled = true;
+  }
+
+  init() {
+    if (!this.ctx) {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (AudioCtx) this.ctx = new AudioCtx();
+    }
+    if (this.ctx && this.ctx.state === "suspended") {
+      this.ctx.resume();
+    }
+  }
+
+  vibrate(pattern) {
+    if (navigator.vibrate) {
+      try { navigator.vibrate(pattern); } catch (e) {}
+    }
+  }
+
+  tone(freq, durationMs, type = "sine", gainVal = 0.18, delayMs = 0) {
+    if (!this.enabled) return;
+    this.init();
+    if (!this.ctx) return;
+    const start = this.ctx.currentTime + delayMs / 1000;
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+    osc.type = type;
+    osc.frequency.setValueAtTime(freq, start);
+    gain.gain.setValueAtTime(gainVal, start);
+    gain.gain.exponentialRampToValueAtTime(0.001, start + durationMs / 1000);
+    osc.connect(gain);
+    gain.connect(this.ctx.destination);
+    osc.start(start);
+    osc.stop(start + durationMs / 1000);
+  }
+
+  beepCountdown() {
+    this.tone(540, 110, "triangle", 0.2);
+    this.vibrate(40);
+  }
+
+  beepGo() {
+    this.tone(880, 140, "sine", 0.25, 0);
+    this.tone(1174, 240, "sine", 0.28, 130);
+    this.vibrate([120, 60, 160]);
+  }
+
+  beepRest() {
+    this.tone(660, 140, "sine", 0.22, 0);
+    this.tone(440, 220, "sine", 0.22, 140);
+    this.vibrate(180);
+  }
+
+  beepSwitchSide() {
+    this.tone(740, 110, "triangle", 0.26, 0);
+    this.tone(987, 110, "triangle", 0.26, 120);
+    this.tone(1318, 220, "triangle", 0.3, 240);
+    this.vibrate([180, 80, 180, 80, 220]);
+  }
+
+  tickTempo(phaseIdx) {
+    if (!this.enabled || !this.metronomeEnabled) return;
+    const freqs = [360, 480, 300];
+    this.tone(freqs[phaseIdx % 3], 45, "sine", 0.07, 0);
+  }
+
+  fanfareFinish() {
+    this.tone(523.25, 140, "triangle", 0.25, 0);
+    this.tone(659.25, 140, "triangle", 0.25, 140);
+    this.tone(783.99, 140, "triangle", 0.25, 280);
+    this.tone(1046.5, 420, "triangle", 0.3, 420);
+    this.vibrate([150, 70, 150, 70, 350]);
+  }
+}
+
+/* ==========================================
+   MAIN APPLICATION CONTROLLER
+   ========================================== */
+class ClimbCoreApp {
+  constructor() {
+    this.storageKey = "climbcore_7a_state_v1";
+    this.sound = new SoundEngine();
+    this.wakeLock = null;
+
+    this.state = {
+      level: 1,
+      week: 1,
+      weeklyTarget: 3,
+      selectedSession: "A",
+      rounds: 3,
+      includeWarmup: true,
+      soundEnabled: true,
+      metronomeEnabled: true,
+      switchPauseEnabled: true,
+      history: [] // { id, dateISO, session, level, rounds, durationSec, tutSec, rpe }
+    };
+
+    // Player runtime
+    this.playlist = [];
+    this.currentStepIdx = 0;
+    this.remainingSec = 0;
+    this.stepTotalSec = 0;
+    this.elapsedSecInStep = 0;
+    this.isPaused = false;
+    this.timerInterval = null;
+    this.workoutStartedAt = null;
+    this.selectedRPE = "good";
+    this.libraryFilter = "ALL";
+    this.lastTempoPhase = -1;
+
+    this.loadState();
+    this.initUI();
+  }
+
+  loadState() {
+    try {
+      const raw = localStorage.getItem(this.storageKey);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        this.state = { ...this.state, ...parsed };
+      }
+    } catch (e) {
+      console.warn("LocalStorage read error", e);
+    }
+    this.sound.enabled = this.state.soundEnabled;
+    this.sound.metronomeEnabled = this.state.metronomeEnabled;
+  }
+
+  saveState() {
+    try {
+      localStorage.setItem(this.storageKey, JSON.stringify(this.state));
+    } catch (e) {
+      console.warn("LocalStorage write error", e);
+    }
+  }
+
+  initUI() {
+    // Auto-select recommended session based on last completed session
+    const nextRec = this.getRecommendedSession();
+    this.state.selectedSession = nextRec;
+    const lvlCfg = LEVELS_CONFIG[this.state.level] || LEVELS_CONFIG[1];
+    this.state.rounds = lvlCfg.defaultRounds;
+
+    this.renderHeaderAndStats();
+    this.renderSessionView();
+    this.renderLibraryView();
+    this.renderProgressView();
+    this.renderSettingsView();
+  }
+
+  getRecommendedSession() {
+    if (!this.state.history || this.state.history.length === 0) return "A";
+    const last = this.state.history[this.state.history.length - 1].session;
+    if (last === "A") return "B";
+    if (last === "B") return "C";
+    return "A";
+  }
+
+  getSessionsThisWeek() {
+    const now = new Date();
+    const day = now.getDay(); // 0=Sun, 1=Mon
+    const diffToMonday = (day === 0 ? -6 : 1) - day;
+    const monday = new Date(now);
+    monday.setDate(now.getDate() + diffToMonday);
+    monday.setHours(0, 0, 0, 0);
+
+    return this.state.history.filter(h => new Date(h.dateISO) >= monday);
+  }
+
+  renderHeaderAndStats() {
+    const lvlCfg = LEVELS_CONFIG[this.state.level];
+    document.getElementById("badgeWeek").textContent = `Sem. ${this.state.week}/8`;
+    document.getElementById("badgeLevel").textContent = `Niv. ${this.state.level}`;
+
+    const weekSessions = this.getSessionsThisWeek();
+    const done = weekSessions.length;
+    const target = this.state.weeklyTarget;
+    document.getElementById("weeklyDoneCount").textContent = done;
+    document.getElementById("weeklyTargetCount").textContent = target;
+    const pct = Math.min(100, Math.round((done / target) * 100));
+    document.getElementById("weeklyProgressBar").style.width = `${pct}%`;
+
+    document.getElementById("currentLevelDisplay").textContent = `Niveau ${this.state.level}`;
+    document.getElementById("currentLevelName").textContent = `${lvlCfg.name} (${lvlCfg.weeks})`;
+  }
+
+  selectSession(sessionKey) {
+    this.state.selectedSession = sessionKey;
+    this.renderSessionView();
+  }
+
+  setRounds(r) {
+    this.state.rounds = r;
+    this.renderSessionView();
+  }
+
+  setWarmup(val) {
+    this.state.includeWarmup = val;
+    this.renderSessionView();
+  }
+
+  renderSessionView() {
+    const rec = this.getRecommendedSession();
+    ["A", "B", "C"].forEach(k => {
+      const tab = document.getElementById(`tab-${k}`);
+      tab.classList.toggle("active-tab", this.state.selectedSession === k);
+      tab.classList.toggle("recommended", rec === k);
+    });
+
+    const meta = SESSIONS_META[this.state.selectedSession];
+    const lvlCfg = LEVELS_CONFIG[this.state.level];
+    const isC = this.state.selectedSession === "C";
+    const workSec = isC ? lvlCfg.workSecC : lvlCfg.workSec;
+    const restSec = isC ? lvlCfg.restSecC : lvlCfg.restSec;
+
+    document.getElementById("sessionTitle").textContent = meta.title;
+    document.getElementById("sessionGoal").textContent = meta.goal;
+
+    // Equipment pills
+    const eqWrap = document.getElementById("sessionEquipment");
+    eqWrap.innerHTML = meta.equip.map(e => `<span class="pill">🛠️ ${e}</span>`).join("");
+
+    // Rounds buttons
+    [2, 3, 4].forEach(r => {
+      document.getElementById(`rounds-${r}`).classList.toggle("active", this.state.rounds === r);
+    });
+
+    // Warmup buttons
+    document.getElementById("warmup-on").classList.toggle("active", this.state.includeWarmup);
+    document.getElementById("warmup-off").classList.toggle("active", !this.state.includeWarmup);
+
+    // Calculate estimated duration
+    const exos = EXERCISES_DB.filter(e => e.session === this.state.selectedSession);
+    const warmupSec = this.state.includeWarmup ? 120 : 0;
+    const circuitSec = this.state.rounds * exos.length * (workSec + restSec);
+    const totalMin = Math.round((warmupSec + circuitSec) / 60);
+    document.getElementById("sessionDurationBadge").textContent = `~${totalMin} min`;
+    document.getElementById("timingSummaryText").textContent =
+      `4 exercices • ${workSec}s effort / ${restSec}s repos (Niv. ${this.state.level})`;
+
+    // Render Exercise preview list
+    const listEl = document.getElementById("sessionExoList");
+    listEl.innerHTML = exos.map((exo, idx) => `
+      <div class="exo-preview-item" onclick="app.openExoModal('${exo.id}')">
+        <div class="exo-mini-svg">${SVG_GRAPHICS[exo.svg]}</div>
+        <div class="exo-preview-info">
+          <div class="exo-preview-name">${idx + 1}. ${exo.name}</div>
+          <div class="exo-preview-meta">
+            <span style="color:var(--amber); font-weight:700;">Niv.${this.state.level}: ${exo.variants[this.state.level]}</span>
+          </div>
+          <div class="exo-preview-meta" style="margin-top:2px;">
+            <span>⏱️ ${workSec}s ${exo.unilateral ? "(G/D mi-temps)" : ""}</span>
+            <span>• 🛠️ ${exo.equipment}</span>
+          </div>
+        </div>
+        <span style="color:var(--text-dim); font-size:16px;">ℹ️</span>
+      </div>
+    `).join("");
+  }
+
+  /* ==========================================
+     WORKOUT PLAYLIST BUILDER & PLAYER
+     ========================================== */
+  buildPlaylist() {
+    const list = [];
+    const lvlCfg = LEVELS_CONFIG[this.state.level];
+    const isC = this.state.selectedSession === "C";
+    const workSec = isC ? lvlCfg.workSecC : lvlCfg.workSec;
+    const restSec = isC ? lvlCfg.restSecC : lvlCfg.restSec;
+
+    // 1. Optional Warmup
+    if (this.state.includeWarmup) {
+      const warmups = EXERCISES_DB.filter(e => e.session === "WARMUP");
+      warmups.forEach((w, idx) => {
+        list.push({
+          phase: "PREP",
+          duration: 5,
+          exo: w,
+          round: 0,
+          totalRounds: this.state.rounds,
+          label: `Échauffement ${idx + 1}/${warmups.length} — Mise en place`
+        });
+        list.push({
+          phase: "WORK",
+          duration: 45,
+          exo: w,
+          round: 0,
+          totalRounds: this.state.rounds,
+          label: `Activation Articulaire (${idx + 1}/${warmups.length})`
+        });
+      });
+    }
+
+    // 2. Main Circuit Rounds
+    const exos = EXERCISES_DB.filter(e => e.session === this.state.selectedSession);
+    for (let r = 1; r <= this.state.rounds; r++) {
+      exos.forEach((exo, idx) => {
+        // Initial prep before first exercise of first round if no warmup
+        if (r === 1 && idx === 0) {
+          list.push({
+            phase: "PREP",
+            duration: 6,
+            exo: exo,
+            round: r,
+            totalRounds: this.state.rounds,
+            label: `Prêt pour le Tour 1/${this.state.rounds}`
+          });
+        }
+
+        if (exo.unilateral) {
+          const half = Math.floor(workSec / 2);
+          list.push({
+            phase: "WORK",
+            side: "GAUCHE",
+            duration: half,
+            exo: exo,
+            round: r,
+            totalRounds: this.state.rounds,
+            label: `Tour ${r}/${this.state.rounds} • Exercice ${idx + 1}/4`
+          });
+          if (this.state.switchPauseEnabled) {
+            list.push({
+              phase: "SWITCH",
+              side: "GAUCHE ➔ DROITE",
+              duration: 4,
+              exo: exo,
+              round: r,
+              totalRounds: this.state.rounds,
+              label: `Changement de côté !`
+            });
+          }
+          list.push({
+            phase: "WORK",
+            side: "DROITE",
+            duration: workSec - half,
+            exo: exo,
+            round: r,
+            totalRounds: this.state.rounds,
+            label: `Tour ${r}/${this.state.rounds} • Exercice ${idx + 1}/4`
+          });
+        } else {
+          list.push({
+            phase: "WORK",
+            side: null,
+            duration: workSec,
+            exo: exo,
+            round: r,
+            totalRounds: this.state.rounds,
+            label: `Tour ${r}/${this.state.rounds} • Exercice ${idx + 1}/4`
+          });
+        }
+
+        // Add Rest unless it's the very last exercise of the very last round
+        const isLastStep = (r === this.state.rounds && idx === exos.length - 1);
+        if (!isLastStep) {
+          const nextExo = (idx + 1 < exos.length) ? exos[idx + 1] : exos[0];
+          const nextRound = (idx + 1 < exos.length) ? r : r + 1;
+          list.push({
+            phase: "REST",
+            duration: restSec,
+            exo: nextExo,
+            round: nextRound,
+            totalRounds: this.state.rounds,
+            label: `Repos • À suivre : ${nextExo.name}`
+          });
+        }
+      });
+    }
+
+    return list;
+  }
+
+  async requestWakeLock() {
+    if ("wakeLock" in navigator) {
+      try {
+        this.wakeLock = await navigator.wakeLock.request("screen");
+        document.getElementById("wakeLockIndicator").textContent = "🔆 Écran maintenu allumé (WakeLock actif)";
+      } catch (e) {
+        document.getElementById("wakeLockIndicator").textContent = "⚡ Mode séance actif";
+      }
+    }
+  }
+
+  releaseWakeLock() {
+    if (this.wakeLock) {
+      try { this.wakeLock.release(); } catch (e) {}
+      this.wakeLock = null;
+    }
+  }
+
+  startWorkout() {
+    this.sound.init();
+    this.playlist = this.buildPlaylist();
+    this.currentStepIdx = 0;
+    this.isPaused = false;
+    this.workoutStartedAt = Date.now();
+
+    document.getElementById("playerOverlay").classList.add("active");
+    this.requestWakeLock();
+    this.loadStep(0);
+
+    if (this.timerInterval) clearInterval(this.timerInterval);
+    this.timerInterval = setInterval(() => this.tick(), 250);
+  }
+
+  loadStep(idx) {
+    if (idx >= this.playlist.length) {
+      this.completeWorkout();
+      return;
+    }
+    this.currentStepIdx = idx;
+    const step = this.playlist[idx];
+    this.stepTotalSec = step.duration;
+    this.remainingSec = step.duration;
+    this.elapsedSecInStep = 0;
+    this.lastSecBeeped = -1;
+    this.lastTempoPhase = -1;
+
+    // Trigger appropriate audio cue on step start
+    if (step.phase === "WORK") {
+      if (step.side === "DROITE" && !this.state.switchPauseEnabled) {
+        this.sound.beepSwitchSide();
+      } else {
+        this.sound.beepGo();
+      }
+    } else if (step.phase === "SWITCH") {
+      this.sound.beepSwitchSide();
+    } else if (step.phase === "REST") {
+      this.sound.beepRest();
+    }
+
+    this.renderPlayerStep();
+  }
+
+  tick() {
+    if (this.isPaused) return;
+    this.elapsedSecInStep += 0.25;
+    const newRem = Math.max(0, Math.ceil(this.stepTotalSec - this.elapsedSecInStep));
+
+    if (newRem !== this.remainingSec) {
+      this.remainingSec = newRem;
+      if (this.remainingSec > 0 && this.remainingSec <= 3 && this.lastSecBeeped !== this.remainingSec) {
+        this.lastSecBeeped = this.remainingSec;
+        this.sound.beepCountdown();
+      }
+    }
+
+    this.updatePlayerLiveTimer();
+
+    if (this.elapsedSecInStep >= this.stepTotalSec) {
+      this.loadStep(this.currentStepIdx + 1);
+    }
+  }
+
+  renderPlayerStep() {
+    const step = this.playlist[this.currentStepIdx];
+    const exo = step.exo;
+
+    // Top title
+    document.getElementById("playerHeaderTitle").textContent =
+      `Séance ${this.state.selectedSession} • ${step.label}`;
+
+    // Progress dots (show work steps)
+    const workSteps = this.playlist.filter(s => s.phase === "WORK");
+    const completedWork = this.playlist.slice(0, this.currentStepIdx).filter(s => s.phase === "WORK").length;
+    document.getElementById("playerDots").innerHTML = workSteps.map((_, i) => {
+      const cls = i < completedWork ? "done" : (i === completedWork && step.phase === "WORK" ? "current" : "");
+      return `<div class="step-dot ${cls}"></div>`;
+    }).join("");
+
+    // Phase Banner
+    const banner = document.getElementById("playerPhaseBanner");
+    banner.className = "phase-banner";
+    if (step.phase === "PREP") {
+      banner.classList.add("phase-prep");
+      banner.textContent = "⏳ PRÉPARATION — MISE EN PLACE";
+    } else if (step.phase === "WORK") {
+      banner.classList.add("phase-work");
+      banner.textContent = step.side ? `🔥 EFFORT EN COURS — CÔTÉ ${step.side}` : "🔥 EFFORT EN COURS — GAINAGE";
+    } else if (step.phase === "SWITCH") {
+      banner.classList.add("phase-switch");
+      banner.textContent = "🔄 CHANGEMENT DE CÔTÉ (GAUCHE ➔ DROITE)";
+    } else {
+      banner.classList.add("phase-rest");
+      banner.textContent = "💨 RÉCUPÉRATION — PRÉPAREZ LA SUITE";
+    }
+
+    // SVG & Titles
+    document.getElementById("playerSvgHolder").innerHTML = SVG_GRAPHICS[exo.svg];
+    document.getElementById("playerEquipBadge").textContent = `🛠️ ${exo.equipment}`;
+
+    const sideBadge = document.getElementById("playerSideBadge");
+    if (step.side) {
+      sideBadge.style.display = "inline-block";
+      sideBadge.textContent = `CÔTÉ ${step.side}`;
+    } else {
+      sideBadge.style.display = "none";
+    }
+
+    document.getElementById("playerExoTitle").textContent =
+      step.phase === "REST" ? `À suivre : ${exo.name}` : exo.name;
+    document.getElementById("playerExoVariant").textContent =
+      `Niveau ${this.state.level} : ${exo.variants[this.state.level]}`;
+
+    // Cues
+    document.getElementById("playerCuesList").innerHTML = exo.cues.map(c => `
+      <div class="cue-item"><span class="cue-dot"></span><span>${c}</span></div>
+    `).join("");
+
+    this.updatePlayerLiveTimer();
+  }
+
+  updatePlayerLiveTimer() {
+    const step = this.playlist[this.currentStepIdx];
+    if (!step) return;
+
+    // Digits
+    const secStr = String(this.remainingSec).padStart(2, "0");
+    document.getElementById("timerSecText").textContent = secStr;
+
+    // Ring progress
+    const ring = document.getElementById("timerRingFg");
+    const circumference = 314.16;
+    const progress = Math.min(1, Math.max(0, this.elapsedSecInStep / this.stepTotalSec));
+    ring.style.strokeDashoffset = circumference * progress;
+
+    if (step.phase === "WORK") {
+      ring.style.stroke = this.remainingSec <= 3 ? "var(--amber)" : "var(--emerald)";
+    } else if (step.phase === "SWITCH" || step.phase === "PREP") {
+      ring.style.stroke = "var(--amber)";
+    } else {
+      ring.style.stroke = "var(--cyan)";
+    }
+
+    // Tempo Guide & Metronome
+    const actionEl = document.getElementById("tempoCurrentAction");
+    const segUp = document.getElementById("tempoSegUp");
+    const segHold = document.getElementById("tempoSegHold");
+    const segDown = document.getElementById("tempoSegDown");
+    segUp.className = "tempo-seg";
+    segHold.className = "tempo-seg";
+    segDown.className = "tempo-seg";
+
+    if (step.phase === "REST") {
+      actionEl.textContent = "💨 Respirez profondément • Préparez le matériel";
+    } else if (step.phase === "PREP") {
+      actionEl.textContent = "🎯 Mettez-vous en position de départ";
+    } else if (step.phase === "SWITCH") {
+      actionEl.textContent = "🔄 Passez immédiatement sur le côté DROIT !";
+    } else if (step.exo.type === "dynamic" && step.exo.tempo) {
+      const [tUp, tHold, tDown] = step.exo.tempo;
+      const cycleTotal = tUp + tHold + tDown;
+      const posInCycle = this.elapsedSecInStep % cycleTotal;
+      let phaseIdx = 0;
+      if (posInCycle < tUp) {
+        phaseIdx = 0;
+        segUp.classList.add("active-up");
+      } else if (posInCycle < tUp + tHold) {
+        phaseIdx = 1;
+        segHold.classList.add("active-hold");
+      } else {
+        phaseIdx = 2;
+        segDown.classList.add("active-down");
+      }
+      actionEl.textContent = step.exo.tempoLabels[phaseIdx];
+      if (phaseIdx !== this.lastTempoPhase) {
+        this.lastTempoPhase = phaseIdx;
+        this.sound.tickTempo(phaseIdx);
+      }
+    } else {
+      // Isometric
+      segHold.classList.add("active-hold");
+      actionEl.textContent = "🔒 MAINTIEN ISOMÉTRIQUE — Respirez court sous tension";
+    }
+  }
+
+  togglePause() {
+    this.isPaused = !this.isPaused;
+    const btn = document.getElementById("btnPlayPause");
+    if (this.isPaused) {
+      btn.textContent = "▶ REPRENDRE";
+      btn.classList.add("paused");
+    } else {
+      btn.textContent = "⏸ PAUSE";
+      btn.classList.remove("paused");
+    }
+  }
+
+  adjustTimer(deltaSec) {
+    // Allow adding 10s of rest or work
+    this.stepTotalSec = Math.max(3, this.stepTotalSec - deltaSec);
+    this.remainingSec = Math.max(1, Math.ceil(this.stepTotalSec - this.elapsedSecInStep));
+    this.updatePlayerLiveTimer();
+  }
+
+  nextStep() {
+    this.loadStep(this.currentStepIdx + 1);
+  }
+
+  togglePlayerSound() {
+    this.setSound(!this.state.soundEnabled);
+    const btn = document.getElementById("playerMuteBtn");
+    btn.textContent = this.state.soundEnabled ? "🔊" : "🔇";
+    btn.classList.toggle("active-toggle", this.state.soundEnabled);
+  }
+
+  confirmExitWorkout() {
+    this.isPaused = true;
+    if (confirm("Arrêter la séance en cours ?")) {
+      clearInterval(this.timerInterval);
+      this.releaseWakeLock();
+      document.getElementById("playerOverlay").classList.remove("active");
+    } else {
+      this.isPaused = false;
+    }
+  }
+
+  completeWorkout() {
+    clearInterval(this.timerInterval);
+    this.releaseWakeLock();
+    this.sound.fanfareFinish();
+
+    document.getElementById("playerOverlay").classList.remove("active");
+
+    const totalWorkSec = this.playlist
+      .filter(s => s.phase === "WORK")
+      .reduce((acc, s) => acc + s.duration, 0);
+    const totalElapsedSec = Math.max(60, Math.round((Date.now() - this.workoutStartedAt) / 1000));
+
+    this.pendingWorkoutRecord = {
+      id: "sess_" + Date.now(),
+      dateISO: new Date().toISOString(),
+      session: this.state.selectedSession,
+      level: this.state.level,
+      rounds: this.state.rounds,
+      durationSec: totalElapsedSec,
+      tutSec: totalWorkSec,
+      rpe: "good"
+    };
+
+    document.getElementById("finishSummarySub").textContent =
+      `Séance ${this.state.selectedSession} • Niveau ${this.state.level} • ${this.state.rounds} tours`;
+    document.getElementById("finishDurationVal").textContent =
+      `${Math.max(1, Math.round(totalElapsedSec / 60))} min`;
+    const tutMin = Math.floor(totalWorkSec / 60);
+    const tutRem = totalWorkSec % 60;
+    document.getElementById("finishTutVal").textContent = `${tutMin}m ${tutRem}s`;
+
+    this.selectRPE("good");
+    document.getElementById("finishModal").classList.add("active");
+  }
+
+  selectRPE(rpe) {
+    this.selectedRPE = rpe;
+    if (this.pendingWorkoutRecord) this.pendingWorkoutRecord.rpe = rpe;
+
+    ["easy", "good", "hard"].forEach(k => {
+      document.getElementById(`rpe-${k}`).classList.toggle("selected", k === rpe);
+    });
+
+    const box = document.getElementById("adaptiveFeedbackBox");
+    if (rpe === "easy") {
+      if (this.state.level < 4) {
+        box.textContent = `💡 Vous avez de la marge ! En validant, vous pourrez passer au Niveau ${this.state.level + 1} sur vos prochaines séances.`;
+      } else {
+        box.textContent = `🔥 Niveau 4 maîtrisé ! Vous avez une caisse de falaise solide.`;
+      }
+    } else if (rpe === "good") {
+      box.textContent = `🎯 Intensité optimale pour stimuler le gainage sans surcharger la récupération.`;
+    } else {
+      box.textContent = `💪 Belle bataille ! Conservez ce niveau pour consolider la posture sur la prochaine séance.`;
+    }
+  }
+
+  saveFinishedWorkout() {
+    if (this.pendingWorkoutRecord) {
+      this.state.history.push(this.pendingWorkoutRecord);
+
+      // Update week progression every 3 sessions
+      const computedWeek = Math.min(8, Math.floor(this.state.history.length / 3) + 1);
+      this.state.week = Math.max(this.state.week, computedWeek);
+
+      // Adaptive level bump if marked easy
+      if (this.selectedRPE === "easy" && this.state.level < 4) {
+        this.state.level += 1;
+      }
+
+      this.saveState();
+      this.pendingWorkoutRecord = null;
+    }
+
+    document.getElementById("finishModal").classList.remove("active");
+    this.initUI();
+    this.switchView("progress");
+  }
+
+  /* ==========================================
+     LIBRARY & MODAL INSPECTOR
+     ========================================== */
+  filterLibrary(filter) {
+    this.libraryFilter = filter;
+    ["ALL", "A", "B", "C"].forEach(f => {
+      document.getElementById(`filter-${f}`).classList.toggle("active", f === filter);
+    });
+    this.renderLibraryView();
+  }
+
+  renderLibraryView() {
+    const container = document.getElementById("libraryContainer");
+    const items = EXERCISES_DB.filter(e => {
+      if (this.libraryFilter === "ALL") return true;
+      return e.session === this.libraryFilter;
+    });
+
+    container.innerHTML = items.map(exo => {
+      const badgeCls = exo.session === "A" ? "coral" : (exo.session === "B" ? "blue" : (exo.session === "C" ? "emerald" : "cyan"));
+      const sessionLabel = exo.session === "WARMUP" ? "Activation" : `Séance ${exo.session}`;
+      return `
+        <div class="card" style="padding:12px;" onclick="app.openExoModal('${exo.id}')">
+          <div style="display:flex; gap:12px; align-items:center;">
+            <div class="exo-mini-svg" style="width:76px; height:64px;">${SVG_GRAPHICS[exo.svg]}</div>
+            <div style="flex:1;">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                <span class="pill ${badgeCls}" style="font-size:10px; padding:2px 8px;">${sessionLabel}</span>
+                <span style="font-size:11px; color:var(--text-muted);">🛠️ ${exo.equipment}</span>
+              </div>
+              <div style="font-size:15px; font-weight:800;">${exo.name}</div>
+              <div style="font-size:12px; color:var(--text-muted); margin-top:2px;">${exo.climbWhy}</div>
+            </div>
+          </div>
+        </div>
+      `;
+    }).join("");
+  }
+
+  openExoModal(exoId) {
+    const exo = EXERCISES_DB.find(e => e.id === exoId);
+    if (!exo) return;
+
+    document.getElementById("modalExoTag").textContent =
+      exo.session === "WARMUP" ? "Activation Articulaire" : `Séance ${exo.session} • ${exo.equipment}`;
+    document.getElementById("modalExoTitle").textContent = exo.name;
+    document.getElementById("modalExoSvg").innerHTML = SVG_GRAPHICS[exo.svg];
+    document.getElementById("modalExoClimbWhy").innerHTML = `<strong>🧗 Transfert Escalade :</strong> ${exo.climbWhy}`;
+    document.getElementById("modalExoCues").innerHTML = exo.cues.map(c => `
+      <div class="cue-item"><span class="cue-dot"></span><span>${c}</span></div>
+    `).join("");
+
+    document.getElementById("modalExoLevels").innerHTML = [1, 2, 3, 4].map(lvl => `
+      <div style="padding:8px 10px; border-radius:8px; background:${lvl === this.state.level ? 'rgba(16,185,129,0.15)' : 'var(--bg-card-elevated)'}; border:1px solid ${lvl === this.state.level ? 'var(--emerald)' : 'var(--border)'};">
+        <strong style="color:${lvl === this.state.level ? 'var(--emerald)' : 'var(--amber)'};">Niveau ${lvl} :</strong> ${exo.variants[lvl]}
+      </div>
+    `).join("");
+
+    document.getElementById("exoDetailModal").classList.add("active");
+  }
+
+  closeExoModal() {
+    document.getElementById("exoDetailModal").classList.remove("active");
+  }
+
+  /* ==========================================
+     PROGRESS, CALENDAR & ROADMAP
+     ========================================== */
+  renderProgressView() {
+    const hist = this.state.history;
+    document.getElementById("statTotalSessions").textContent = hist.length;
+    const totalTutMin = Math.round(hist.reduce((acc, h) => acc + (h.tutSec || 420), 0) / 60);
+    document.getElementById("statTotalMinutes").textContent = totalTutMin;
+
+    // 28-day calendar
+    const calEl = document.getElementById("calendarGrid");
+    const headers = ["L", "M", "M", "J", "V", "S", "D"].map(d => `<div class="cal-day-header">${d}</div>`).join("");
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const cells = [];
+    for (let i = 27; i >= 0; i--) {
+      const d = new Date(today);
+      d.setDate(today.getDate() - i);
+      const dayISO = d.toISOString().slice(0, 10);
+      const match = hist.find(h => h.dateISO.slice(0, 10) === dayISO);
+      let cls = i === 0 ? "today" : "";
+      let badge = d.getDate();
+      if (match) {
+        cls += ` done-${match.session}`;
+        badge = `${d.getDate()}<span style="font-size:9px; font-weight:900;">${match.session}</span>`;
+      }
+      cells.push(`<div class="cal-cell ${cls}">${badge}</div>`);
+    }
+    calEl.innerHTML = headers + cells.join("");
+
+    // 4 Levels Roadmap
+    const roadmapEl = document.getElementById("levelsRoadmap");
+    roadmapEl.innerHTML = [1, 2, 3, 4].map(lvl => {
+      const cfg = LEVELS_CONFIG[lvl];
+      const active = this.state.level === lvl;
+      return `
+        <div onclick="app.setLevel(${lvl})" style="cursor:pointer; padding:12px; border-radius:12px; background:${active ? 'rgba(16,185,129,0.14)' : 'var(--bg-card-elevated)'}; border:1.5px solid ${active ? 'var(--emerald)' : 'var(--border)'}; display:flex; justify-content:space-between; align-items:center;">
+          <div>
+            <div style="font-size:13px; font-weight:800; color:${active ? 'var(--emerald)' : 'var(--text-main)'};">
+              Niveau ${lvl} — ${cfg.name} (${cfg.weeks})
+            </div>
+            <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">${cfg.desc}</div>
+          </div>
+          <span class="pill ${active ? 'emerald' : ''}">${active ? 'Actif' : 'Choisir'}</span>
+        </div>
+      `;
+    }).join("");
+
+    // Recent History list
+    const histEl = document.getElementById("historyList");
+    if (hist.length === 0) {
+      histEl.innerHTML = `<div style="font-size:12px; color:var(--text-muted); text-align:center; padding:12px;">Aucune séance enregistrée pour le moment.</div>`;
+    } else {
+      histEl.innerHTML = hist.slice().reverse().slice(0, 10).map(h => {
+        const d = new Date(h.dateISO).toLocaleDateString("fr-FR", { weekday: "short", day: "numeric", month: "short" });
+        const rpeIcon = h.rpe === "easy" ? "😎" : (h.rpe === "hard" ? "🥵" : "🎯");
+        return `
+          <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 12px; background:var(--bg-card-elevated); border-radius:10px; border:1px solid var(--border); font-size:12px;">
+            <div>
+              <strong>Séance ${h.session}</strong> • Niv. ${h.level} (${h.rounds} tours)
+              <div style="font-size:11px; color:var(--text-muted);">${d}</div>
+            </div>
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span class="pill emerald">${Math.round((h.durationSec || 840) / 60)} min</span>
+              <span style="font-size:16px;">${rpeIcon}</span>
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+  }
+
+  setLevel(lvl) {
+    this.state.level = lvl;
+    this.state.rounds = LEVELS_CONFIG[lvl].defaultRounds;
+    this.saveState();
+    this.initUI();
+  }
+
+  openLevelPicker() {
+    this.switchView("progress");
+  }
+
+  logManualSessionPrompt() {
+    const s = prompt("Quelle séance souhaitez-vous valider manuellement ? (A, B ou C)", this.state.selectedSession);
+    if (!s) return;
+    const clean = s.trim().toUpperCase();
+    if (!["A", "B", "C"].includes(clean)) {
+      alert("Veuillez entrer A, B ou C.");
+      return;
+    }
+    this.state.history.push({
+      id: "manual_" + Date.now(),
+      dateISO: new Date().toISOString(),
+      session: clean,
+      level: this.state.level,
+      rounds: this.state.rounds,
+      durationSec: 900,
+      tutSec: 480,
+      rpe: "good"
+    });
+    this.saveState();
+    this.initUI();
+  }
+
+  /* ==========================================
+     SETTINGS & EXPORT (JSON + SQLITE)
+     ========================================== */
+  renderSettingsView() {
+    document.getElementById("target-2").classList.toggle("active", this.state.weeklyTarget === 2);
+    document.getElementById("target-3").classList.toggle("active", this.state.weeklyTarget === 3);
+
+    document.getElementById("sound-on").classList.toggle("active", this.state.soundEnabled);
+    document.getElementById("sound-off").classList.toggle("active", !this.state.soundEnabled);
+
+    document.getElementById("metro-on").classList.toggle("active", this.state.metronomeEnabled);
+    document.getElementById("metro-off").classList.toggle("active", !this.state.metronomeEnabled);
+
+    document.getElementById("switchpause-on").classList.toggle("active", this.state.switchPauseEnabled);
+    document.getElementById("switchpause-off").classList.toggle("active", !this.state.switchPauseEnabled);
+  }
+
+  setWeeklyTarget(t) {
+    this.state.weeklyTarget = t;
+    this.saveState();
+    this.renderHeaderAndStats();
+    this.renderSettingsView();
+  }
+
+  setSound(val) {
+    this.state.soundEnabled = val;
+    this.sound.enabled = val;
+    this.saveState();
+    this.renderSettingsView();
+  }
+
+  setMetronome(val) {
+    this.state.metronomeEnabled = val;
+    this.sound.metronomeEnabled = val;
+    this.saveState();
+    this.renderSettingsView();
+  }
+
+  setSwitchPause(val) {
+    this.state.switchPauseEnabled = val;
+    this.saveState();
+    this.renderSettingsView();
+  }
+
+  exportJSON() {
+    const blob = new Blob([JSON.stringify(this.state, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `climbcore-backup-${new Date().toISOString().slice(0, 10)}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  exportSQL() {
+    const lines = [
+      "-- Export SQLite ClimbCore 7a+",
+      "CREATE TABLE IF NOT EXISTS workout_history (",
+      "  id TEXT PRIMARY KEY,",
+      "  date_iso TEXT,",
+      "  session TEXT,",
+      "  level INTEGER,",
+      "  rounds INTEGER,",
+      "  duration_sec INTEGER,",
+      "  tut_sec INTEGER,",
+      "  rpe TEXT",
+      ");"
+    ];
+    this.state.history.forEach(h => {
+      lines.push(
+        `INSERT OR REPLACE INTO workout_history VALUES ('${h.id}', '${h.dateISO}', '${h.session}', ${h.level}, ${h.rounds}, ${h.durationSec}, ${h.tutSec}, '${h.rpe}');`
+      );
+    });
+    const blob = new Blob([lines.join("\n")], { type: "application/sql" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `climbcore-sqlite-${new Date().toISOString().slice(0, 10)}.sql`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  importJSON(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const imported = JSON.parse(e.target.result);
+        this.state = { ...this.state, ...imported };
+        this.saveState();
+        this.initUI();
+        alert("Sauvegarde importée avec succès !");
+      } catch (err) {
+        alert("Fichier JSON invalide.");
+      }
+    };
+    reader.readAsText(file);
+  }
+
+  resetDataPrompt() {
+    if (confirm("Voulez-vous vraiment effacer tout l'historique et revenir à la Semaine 1 / Niveau 1 ?")) {
+      localStorage.removeItem(this.storageKey);
+      this.state.history = [];
+      this.state.level = 1;
+      this.state.week = 1;
+      this.saveState();
+      this.initUI();
+    }
+  }
+
+  switchView(viewName) {
+    ["today", "library", "progress", "settings"].forEach(v => {
+      document.getElementById(`view-${v}`).classList.toggle("active", v === viewName);
+      document.getElementById(`nav-${v}`).classList.toggle("active", v === viewName);
+    });
+  }
+}
+
+const app = new ClimbCoreApp();
+</script>
+</body>
+</html>
