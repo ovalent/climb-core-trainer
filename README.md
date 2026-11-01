@@ -2,6 +2,8 @@
 
 Application d'entraînement autonome, ultra-légère et 100 % hors-ligne, conçue dans un **fichier HTML unique** ([`climb-core-trainer.html`](file:///c:/Users/ovale/Documents/climb_core_trainer/climb-core-trainer.html)) pour développer la force du tronc, le gainage profond et soutenir la progression en escalade sportive (passage du cap **6b/7a vers 7a+** en voie, falaise et dévers).
 
+🌐 **Accès en ligne direct (GitHub Pages)** : [https://ovalent.github.io/climb-core-trainer/](https://ovalent.github.io/climb-core-trainer/)
+
 ---
 
 ## 📖 1. Introduction
